@@ -31,7 +31,10 @@ locals {
   ]...)
 }
 
-resource "scaleway_flexible_ip" "gateway" {
+resource "scaleway_vpc_public_gateway_ip" "gateway" {
+  # scaleway_flexible_ip est la ressource IP flexible d'Elastic Metal (serveurs baremetal) : elle
+  # n'a rien à voir avec l'IP publique d'une VPC Public Gateway, malgré la ressemblance du nom.
+  # scaleway_vpc_public_gateway_ip est le type dédié à cet usage.
   for_each = local.gateway_instances
 
   zone       = each.value.zone
@@ -39,25 +42,13 @@ resource "scaleway_flexible_ip" "gateway" {
   tags       = var.tags
 }
 
-resource "time_sleep" "wait_after_flexible_ip" {
-  # L'IP flexible n'est pas immédiatement visible par l'API VPC Public Gateway juste après sa
-  # création (propagation asynchrone côté Scaleway) : sans ce délai, l'attachement de l'IP à la
-  # gateway échoue avec "resource ip with ID ... is not found" alors que l'IP existe bien.
-  for_each = local.gateway_instances
-
-  depends_on      = [scaleway_flexible_ip.gateway]
-  create_duration = "10s"
-}
-
 resource "scaleway_vpc_public_gateway" "this" {
   for_each = local.gateway_instances
-
-  depends_on = [time_sleep.wait_after_flexible_ip]
 
   name       = "${var.name}-${each.value.gateway_key}-${each.value.zone}"
   zone       = each.value.zone
   type       = each.value.type
-  ip_id      = scaleway_flexible_ip.gateway[each.key].id
+  ip_id      = scaleway_vpc_public_gateway_ip.gateway[each.key].id
   project_id = var.project_id
   tags       = var.tags
 }
