@@ -39,8 +39,20 @@ resource "scaleway_flexible_ip" "gateway" {
   tags       = var.tags
 }
 
+resource "time_sleep" "wait_after_flexible_ip" {
+  # L'IP flexible n'est pas immédiatement visible par l'API VPC Public Gateway juste après sa
+  # création (propagation asynchrone côté Scaleway) : sans ce délai, l'attachement de l'IP à la
+  # gateway échoue avec "resource ip with ID ... is not found" alors que l'IP existe bien.
+  for_each = local.gateway_instances
+
+  depends_on      = [scaleway_flexible_ip.gateway]
+  create_duration = "10s"
+}
+
 resource "scaleway_vpc_public_gateway" "this" {
   for_each = local.gateway_instances
+
+  depends_on = [time_sleep.wait_after_flexible_ip]
 
   name       = "${var.name}-${each.value.gateway_key}-${each.value.zone}"
   zone       = each.value.zone
