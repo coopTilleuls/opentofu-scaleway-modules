@@ -78,6 +78,10 @@ resource "scaleway_vpc_gateway_network" "this" {
 
   depends_on = [time_sleep.wait_after_gateway]
 
+  # Sans ce zone explicite, le provider retombe sur le default_zone du profil scw (souvent
+  # fr-par-1) au lieu de déduire la zone depuis gateway_id, et échoue avec "resource gateway with
+  # ID ... is not found" pour toute gateway qui ne serait pas dans cette zone par défaut.
+  zone               = each.value.zone
   gateway_id         = scaleway_vpc_public_gateway.this[each.key].id
   private_network_id = scaleway_vpc_private_network.this[each.value.private_network_key].id
   enable_masquerade  = each.value.enable_masquerade
