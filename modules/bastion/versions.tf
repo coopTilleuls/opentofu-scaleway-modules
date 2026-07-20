@@ -6,5 +6,9 @@ terraform {
       source  = "scaleway/scaleway"
       version = ">= 2.79.0, < 3.0.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.2.0"
+    }
   }
 }

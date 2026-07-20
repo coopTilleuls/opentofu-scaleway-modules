@@ -57,3 +57,39 @@ variable "tags" {
   type        = list(string)
   default     = []
 }
+
+variable "ansible_playbook_path" {
+  description = <<-EOT
+    Chemin vers un playbook Ansible (ex: "$${path.root}/ansible/playbook.yml") exécuté contre le
+    bastion via SSH juste après son démarrage. Laisser à null (défaut) pour ne pas exécuter
+    Ansible : le bastion reste alors uniquement configuré par `user_data` (cloud-init).
+
+    Motif repris de opentofu-ffspt : la configuration ré-appliquable (comptes utilisateurs...) est
+    mieux gérée par un playbook Ansible idempotent, ré-exécuté à chaque changement (piloté par
+    `ansible_triggers`), que par du cloud-init qui ne s'exécute qu'une seule fois au premier boot.
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "ansible_ssh_user" {
+  description = "Utilisateur SSH utilisé pour se connecter au bastion et exécuter Ansible."
+  type        = string
+  default     = "admin"
+}
+
+variable "ansible_extra_vars_file" {
+  description = "Fichier de variables Ansible (`-e @fichier`) passé à `ansible-playbook`, par exemple le group_vars du repo consommateur. Laisser à null pour ne pas en passer."
+  type        = string
+  default     = null
+}
+
+variable "ansible_triggers" {
+  description = <<-EOT
+    Map de valeurs (typiquement des `filemd5(...)` sur le playbook et ses fichiers de variables)
+    dont un changement déclenche une ré-exécution d'Ansible sur le bastion déjà existant, sans le
+    recréer. Laisser vide pour ne l'exécuter qu'à la création du bastion.
+  EOT
+  type        = map(string)
+  default     = {}
+}

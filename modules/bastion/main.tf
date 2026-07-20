@@ -39,3 +39,43 @@ resource "scaleway_instance_server" "this" {
     pn_id = var.private_network_id
   }
 }
+
+resource "null_resource" "ansible" {
+  # Optionnel : exécute un playbook Ansible du repo consommateur contre le bastion, pour la
+  # configuration ré-appliquable (comptes utilisateurs, etc.) que cloud-init ne sait gérer qu'une
+  # fois, au premier boot.
+  count = var.ansible_playbook_path != null ? 1 : 0
+
+  depends_on = [scaleway_instance_server.this]
+
+  triggers = merge(var.ansible_triggers, {
+    playbook_hash = filemd5(var.ansible_playbook_path)
+    bastion_ip    = scaleway_instance_ip.this.address
+  })
+
+  connection {
+    type  = "ssh"
+    user  = var.ansible_ssh_user
+    host  = scaleway_instance_ip.this.address
+    agent = true
+  }
+
+  # S'assure que cloud-init (paquets, montage du volume additionnel...) a terminé avant qu'Ansible
+  # ne prenne le relais.
+  provisioner "remote-exec" {
+    inline = ["cloud-init status --wait"]
+  }
+
+  provisioner "local-exec" {
+    command = join(" ", compact([
+      "ansible-playbook",
+      "-i '${scaleway_instance_ip.this.address},'",
+      "-u ${var.ansible_ssh_user}",
+      var.ansible_extra_vars_file != null ? "-e @${var.ansible_extra_vars_file}" : "",
+      var.ansible_playbook_path,
+    ]))
+    environment = {
+      ANSIBLE_HOST_KEY_CHECKING = "False"
+    }
+  }
+}
