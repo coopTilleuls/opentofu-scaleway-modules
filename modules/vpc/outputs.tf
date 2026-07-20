@@ -15,7 +15,7 @@ output "public_gateway_ids" {
 
 output "public_gateway_ips" {
   description = "Map \"clé_gateway/zone\" => adresse IP flexible publique de la gateway."
-  value       = { for key, ip in scaleway_flexible_ip.gateway : key => ip.address }
+  value       = { for key, ip in scaleway_flexible_ip.gateway : key => ip.ip_address }
 }
 
 output "gateway_network_ids" {
