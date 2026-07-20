@@ -63,8 +63,20 @@ resource "scaleway_ipam_ip" "gateway" {
   }
 }
 
+resource "time_sleep" "wait_after_gateway" {
+  # La gateway n'est pas immédiatement visible par l'API juste après sa création (propagation
+  # asynchrone côté Scaleway) : sans ce délai, l'attachement au private network échoue par
+  # intermittence avec "resource gateway with ID ... is not found" alors que la gateway existe bien.
+  for_each = local.gateway_instances
+
+  depends_on      = [scaleway_vpc_public_gateway.this]
+  create_duration = "15s"
+}
+
 resource "scaleway_vpc_gateway_network" "this" {
   for_each = local.gateway_instances
+
+  depends_on = [time_sleep.wait_after_gateway]
 
   gateway_id         = scaleway_vpc_public_gateway.this[each.key].id
   private_network_id = scaleway_vpc_private_network.this[each.value.private_network_key].id
