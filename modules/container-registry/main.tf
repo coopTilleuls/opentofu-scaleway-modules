@@ -4,7 +4,9 @@
 resource "scaleway_registry_namespace" "this" {
   name        = var.name
   description = var.description
-  is_public   = var.is_public
-  project_id  = var.project_id
-  region      = var.region
+  # `false` par défaut dans les deux repos d'origine, où la valeur était toujours fixée en dur
+  # (jamais laissée au défaut du provider).
+  is_public  = var.is_public
+  project_id = var.project_id
+  region     = var.region
 }
