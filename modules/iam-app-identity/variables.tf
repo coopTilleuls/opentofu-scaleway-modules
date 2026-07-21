@@ -10,8 +10,35 @@ variable "description" {
 }
 
 variable "permission_set_names" {
-  description = "Noms des permission sets Scaleway à accorder (ex: [\"ObjectStorageFullAccess\"])."
+  description = <<-EOT
+    Noms des permission sets Scaleway à accorder (ex: ["ObjectStorageFullAccess"]) via une
+    `scaleway_iam_policy` dédiée. Laisser vide (défaut) si l'application n'a besoin d'aucune
+    policy propre, par exemple lorsqu'elle est simplement rattachée à un groupe IAM existant via
+    `iam_group_id`.
+  EOT
   type        = list(string)
+  default     = []
+}
+
+variable "iam_group_id" {
+  description = <<-EOT
+    ID d'un groupe IAM existant auquel rattacher l'application (motif observé pour la clé CI
+    GitLab de sweeek : application membre du groupe "LeadDeveloper", sans policy dédiée). Laisser
+    à null (défaut) pour ne pas rattacher l'application à un groupe.
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "default_project_id" {
+  description = <<-EOT
+    Projet Scaleway par défaut de la clé API générée (`default_project_id` sur
+    `scaleway_iam_api_key`). Renseigné dans toutes les occurrences liées à l'Object Storage des
+    deux repos d'origine (Velero, Loki, CNPG, buckets applicatifs) ; laisser à null (défaut) pour
+    les autres usages (Container Registry, ESO, CI...) qui ne le renseignaient jamais.
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "project_ids" {
