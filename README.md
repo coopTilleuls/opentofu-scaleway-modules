@@ -50,7 +50,7 @@ Chaque module se référence via une source git versionnée par tag, par exemple
 
 ```hcl
 module "vpc" {
-  source = "git::https://<url-de-ce-repo>//modules/vpc?ref=v1.0.0"
+  source = "git::https://<url-de-ce-repo>//modules/vpc?ref=vpc-v1.0.0"
   # ...
 }
 ```
@@ -60,17 +60,23 @@ appels à ces modules, choix des tags de version) est gérée séparément, hors
 
 ## Publication des releases
 
-Les tags `vX.Y.Z` et les releases GitHub sont générés automatiquement par
+Les tags et les releases GitHub sont générés automatiquement par
 [release-please](https://github.com/googleapis/release-please), à partir des messages de commit
 conventionnels déjà utilisés dans ce repo (`feat(module): ...`, `fix(module): ...`, `chore: ...`).
 
-- Chaque push sur `main` met à jour (ou crée) une pull request "release" proposant le prochain
-  numéro de version et le `CHANGELOG.md` correspondant.
-- Merger cette pull request crée le tag Git et la release GitHub associée, immédiatement
-  utilisable via `ref=vX.Y.Z` (cf section ci-dessus). Rien à taguer à la main.
-- Un seul numéro de version couvre tous les modules de ce repo (pas de versioning indépendant par
-  module) : un `fix(vpc)` incrémente la même version qu'un `feat(bastion)`. Compromis assumé pour
-  un repo mono-module-Terraform de cette taille, plutôt que des repos séparés par module.
+- **Versioning indépendant par module** : chaque module du tableau ci-dessus a son propre numéro
+  de version et son propre tag, au format `<module>-vX.Y.Z` (ex: `vpc-v1.2.0`,
+  `bastion-v1.0.1`). release-please détermine, pour chaque module, quels commits ont modifié des
+  fichiers sous `modules/<module>/` depuis son dernier tag, et en déduit le bump (`fix` → patch,
+  `feat` → minor, `!`/`BREAKING CHANGE` → major).
+- Chaque push sur `main` met à jour (ou crée) une pull request "release" par module impacté,
+  proposant le prochain numéro de version et le `CHANGELOG.md` du module correspondant
+  (`modules/<module>/CHANGELOG.md`).
+- Merger une de ces pull requests crée le tag Git et la release GitHub associée, immédiatement
+  utilisable via `ref=<module>-vX.Y.Z` dans les repos consommateurs (cf section ci-dessus). Rien
+  à taguer à la main.
+- Un commit qui touche plusieurs modules à la fois (à éviter autant que possible) déclenche une
+  pull request de release pour chacun d'entre eux.
 
 ## Validation
 

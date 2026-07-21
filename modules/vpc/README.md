@@ -9,7 +9,7 @@ pour figer l'IP d'un ingress controller avant de configurer le DNS).
 
 ```hcl
 module "vpc" {
-  source = "git::https://<repo-url>//modules/vpc?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/vpc?ref=vpc-vX.Y.Z"
 
   name           = "vpc-multi-az"
   project_id     = var.project_id

@@ -8,7 +8,7 @@ private network (typiquement le private network "tools" du module
 
 ```hcl
 module "bastion" {
-  source = "git::https://<repo-url>//modules/bastion?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/bastion?ref=bastion-vX.Y.Z"
 
   name                = "bastion-${terraform.workspace}"
   project_id          = var.project_id

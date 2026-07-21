@@ -10,7 +10,7 @@ Velero, Loki, CNPG et les buckets applicatifs dans les deux repos audités.
 
 ```hcl
 module "velero_identity" {
-  source = "git::https://<repo-url>//modules/iam-app-identity?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/iam-app-identity?ref=iam-app-identity-vX.Y.Z"
 
   name                 = "velero"
   permission_set_names = ["ObjectStorageFullAccess"]
@@ -18,7 +18,7 @@ module "velero_identity" {
 }
 
 module "velero_bucket" {
-  source = "git::https://<repo-url>//modules/object-bucket?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/object-bucket?ref=object-bucket-vX.Y.Z"
 
   name       = "velero-${terraform.workspace}"
   project_id = var.project_id

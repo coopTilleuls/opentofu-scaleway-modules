@@ -8,7 +8,7 @@ bases de données et, optionnellement, un utilisateur applicatif dédié par bas
 
 ```hcl
 module "postgresql" {
-  source = "git::https://<repo-url>//modules/rdb-postgresql?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/rdb-postgresql?ref=rdb-postgresql-vX.Y.Z"
 
   name               = "myproject-rdb-${terraform.workspace}"
   project_id         = var.project_id

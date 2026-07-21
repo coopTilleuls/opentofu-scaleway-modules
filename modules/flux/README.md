@@ -20,7 +20,7 @@ hérite donc des mêmes contraintes opérationnelles que les repos d'origine (vo
 
 ```hcl
 module "flux" {
-  source = "git::https://<repo-url>//modules/flux?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/flux?ref=flux-vX.Y.Z"
 
   git_repository_url = "ssh://git@github.com/<org>/<repo-gitops>"
   git_branch          = terraform.workspace == "prod" ? "main" : "staging"

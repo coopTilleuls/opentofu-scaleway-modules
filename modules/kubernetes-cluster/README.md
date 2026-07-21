@@ -14,7 +14,7 @@ Scaleway du cluster.
 
 ```hcl
 module "kubernetes" {
-  source = "git::https://<repo-url>//modules/kubernetes-cluster?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/kubernetes-cluster?ref=kubernetes-cluster-vX.Y.Z"
 
   name                = "myproject-${terraform.workspace}"
   project_id          = var.project_id

@@ -9,14 +9,14 @@ une application IAM dédiée avec la permission `ContainerRegistryReadOnly`).
 
 ```hcl
 module "registry" {
-  source = "git::https://<repo-url>//modules/container-registry?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/container-registry?ref=container-registry-vX.Y.Z"
 
   name       = "myproject-cr"
   project_id = var.project_id
 }
 
 module "registry_pull_secret" {
-  source = "git::https://<repo-url>//modules/iam-app-identity?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/iam-app-identity?ref=iam-app-identity-vX.Y.Z"
 
   name                 = "kubernetes-imagepullsecret"
   permission_set_names = ["ContainerRegistryReadOnly"]
