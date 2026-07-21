@@ -1,7 +1,7 @@
 {
   "modules/vpc": "1.0.0",
   "modules/kubernetes-cluster": "0.0.0",
-  "modules/rdb-postgresql": "0.0.0",
+  "modules/rdb-postgresql": "1.0.0",
   "modules/rdb-mysql": "1.0.0",
   "modules/iam-app-identity": "1.0.0",
   "modules/object-bucket": "0.0.0",
