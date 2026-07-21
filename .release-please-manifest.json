@@ -6,6 +6,6 @@
   "modules/iam-app-identity": "0.0.0",
   "modules/object-bucket": "0.0.0",
   "modules/container-registry": "0.0.0",
-  "modules/flux": "1.0.0"
-  "modules/bastion": "1.0.0",
+  "modules/flux": "1.0.0",
+  "modules/bastion": "1.0.0"
 }
