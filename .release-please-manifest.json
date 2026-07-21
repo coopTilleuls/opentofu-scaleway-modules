@@ -1,5 +1,5 @@
 {
-  "modules/vpc": "0.0.0",
+  "modules/vpc": "1.0.0",
   "modules/kubernetes-cluster": "0.0.0",
   "modules/rdb-postgresql": "0.0.0",
   "modules/rdb-mysql": "0.0.0",
