@@ -32,4 +32,8 @@ module "mysql" {
 - Si `admin_password` n'est pas fourni, un mot de passe est généré et exposé (sensible) via
   l'output `admin_password`.
 - Aucun des deux repos d'origine n'utilisait de tuning `settings` pour MySQL ; le paramètre
-  reste disponible pour un usage futur mais vide par défaut.
+  reste disponible pour un usage futur mais vide par défaut. Laissé vide, aucun `settings` n'est
+  envoyé à l'API : les réglages déjà présents sur l'instance ne sont donc jamais réinitialisés.
+- Les mots de passe générés (admin et utilisateurs dédiés) n'utilisent que `_` comme caractère
+  spécial, pour rester sans risque une fois interpolés dans une DSN
+  `mysql://user:password@host:port/db` ou lors d'un export shell.
