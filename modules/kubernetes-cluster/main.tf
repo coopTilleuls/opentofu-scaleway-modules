@@ -110,11 +110,17 @@ resource "scaleway_k8s_pool" "this" {
 resource "null_resource" "kubeconfig" {
   count = var.install_kubeconfig ? 1 : 0
 
+  # Attend que les pools existent : sans cette dépendance, rien n'empêche `scw k8s kubeconfig
+  # install` de s'exécuter en parallèle de leur création côté API.
+  depends_on = [scaleway_k8s_pool.this]
+
   triggers = {
     cluster_id = scaleway_k8s_cluster.this.id
   }
 
   provisioner "local-exec" {
-    command = "scw k8s kubeconfig install ${scaleway_k8s_cluster.this.id}"
+    # scaleway_k8s_cluster.this.id est au format "<region>/<uuid>" ; la CLI `scw` attend l'UUID
+    # seul, d'où le retrait du préfixe régional.
+    command = "scw k8s kubeconfig install ${regex("(?:.*/)?(.*)", scaleway_k8s_cluster.this.id)[0]}"
   }
 }
