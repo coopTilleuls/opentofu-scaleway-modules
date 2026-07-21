@@ -4,8 +4,8 @@ output "application_id" {
 }
 
 output "policy_id" {
-  description = "ID de la policy IAM."
-  value       = scaleway_iam_policy.this.id
+  description = "ID de la policy IAM, si `permission_set_names` est non vide (sinon `null`)."
+  value       = length(scaleway_iam_policy.this) > 0 ? scaleway_iam_policy.this[0].id : null
 }
 
 output "access_key" {
