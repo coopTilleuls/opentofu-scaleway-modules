@@ -58,6 +58,20 @@ module "vpc" {
 L'intégration dans les repos `sweeek` et `opentofu-ffspt` (remplacement du code dupliqué par des
 appels à ces modules, choix des tags de version) est gérée séparément, hors périmètre de ce repo.
 
+## Publication des releases
+
+Les tags `vX.Y.Z` et les releases GitHub sont générés automatiquement par
+[release-please](https://github.com/googleapis/release-please), à partir des messages de commit
+conventionnels déjà utilisés dans ce repo (`feat(module): ...`, `fix(module): ...`, `chore: ...`).
+
+- Chaque push sur `main` met à jour (ou crée) une pull request "release" proposant le prochain
+  numéro de version et le `CHANGELOG.md` correspondant.
+- Merger cette pull request crée le tag Git et la release GitHub associée, immédiatement
+  utilisable via `ref=vX.Y.Z` (cf section ci-dessus). Rien à taguer à la main.
+- Un seul numéro de version couvre tous les modules de ce repo (pas de versioning indépendant par
+  module) : un `fix(vpc)` incrémente la même version qu'un `feat(bastion)`. Compromis assumé pour
+  un repo mono-module-Terraform de cette taille, plutôt que des repos séparés par module.
+
 ## Validation
 
 Chaque module a été vérifié avec `tofu init -backend=false && tofu validate` et formaté avec
