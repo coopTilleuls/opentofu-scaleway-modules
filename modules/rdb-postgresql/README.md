@@ -37,4 +37,8 @@ module "postgresql" {
   d'usage multi-bases avec un utilisateur applicatif isolé par base.
 - `settings` permet le tuning fin du moteur (`effective_cache_size`, `max_connections`,
   `work_mem`...) — vérifier la documentation Scaleway du moteur pour les unités attendues
-  (certains réglages sont en Mo et non en ko).
+  (certains réglages sont en Mo et non en ko). Laissé vide (défaut), aucun `settings` n'est
+  envoyé à l'API : les réglages déjà présents sur l'instance ne sont donc jamais réinitialisés.
+- Les mots de passe générés (admin et utilisateurs dédiés) n'utilisent que `_` comme caractère
+  spécial, pour rester sans risque une fois interpolés dans une DSN
+  `postgresql://user:password@host:port/db` ou lors d'un export shell.
