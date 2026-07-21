@@ -46,8 +46,9 @@ module "velero_bucket" {
   `scaleway_object_bucket` (tags de type S3).
 - Si ni `sre_group_id`, ni `app_application_id`, ni `additional_policy_statements` ne sont
   renseignés, aucune `scaleway_object_bucket_policy` n'est créée (bucket sans policy explicite).
-- Le format `Principal.SCW = "group_id:<id>"` pour les groupes est déduit par analogie avec les
-  formats documentés par Scaleway pour `user_id:`/`application_id:`/`project_id:` — à vérifier au
-  premier `tofu apply` si Scaleway venait à changer ce format.
+- `sre_group_id` résout le groupe via `data.scaleway_iam_group` et construit `Principal.SCW`
+  comme une **liste de `user_id:<id>`** (un par membre du groupe), pas `"group_id:<id>"` : les deux
+  repos d'origine évitent systématiquement ce dernier format (jamais éprouvé en production d'après
+  leurs propres commentaires), et résolvent toujours le groupe en membres individuels.
 - `additional_policy_statements` permet d'ajouter un statement ad hoc (ex: le statement "lead
   developer" observé dans `ffspt/.../dump.tf`) sans complexifier l'interface du module.

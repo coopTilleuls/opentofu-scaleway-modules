@@ -34,14 +34,23 @@ resource "scaleway_object_bucket" "this" {
   }
 }
 
+data "scaleway_iam_group" "sre" {
+  count = var.sre_group_id != null ? 1 : 0
+
+  group_id = var.sre_group_id
+}
+
 locals {
   # Statement "accès total" pour le groupe SRE : présent dans tous les buckets applicatifs des
-  # deux repos d'origine, en plus de l'accès scopé à l'application elle-même.
+  # deux repos d'origine, en plus de l'accès scopé à l'application elle-même. Les deux repos
+  # sources résolvent systématiquement le groupe en la liste des `user_id:` de ses membres (jamais
+  # `group_id:<id>`, jamais éprouvé en production d'après leurs propres commentaires : "pas de
+  # groupe pour l'instant, il faudra surveiller les news").
   sre_statement = var.sre_group_id == null ? [] : [{
     Sid    = "SreFullAccess"
     Effect = "Allow"
     Principal = {
-      SCW = "group_id:${var.sre_group_id}"
+      SCW = [for user_id in data.scaleway_iam_group.sre[0].user_ids : "user_id:${user_id}"]
     }
     Action = var.sre_actions
     Resource = [
@@ -69,7 +78,8 @@ locals {
 resource "scaleway_object_bucket_policy" "this" {
   count = length(local.policy_statements) > 0 ? 1 : 0
 
-  bucket = scaleway_object_bucket.this.name
+  bucket     = scaleway_object_bucket.this.name
+  project_id = var.project_id
   policy = jsonencode({
     Version   = "2023-04-17"
     Id        = "${var.name}-policy"
