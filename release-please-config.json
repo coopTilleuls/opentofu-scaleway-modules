@@ -1,8 +1,42 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "release-type": "simple",
+  "separate-pull-requests": true,
   "packages": {
-    ".": {
+    "modules/vpc": {
+      "component": "vpc",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/kubernetes-cluster": {
+      "component": "kubernetes-cluster",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/rdb-postgresql": {
+      "component": "rdb-postgresql",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/rdb-mysql": {
+      "component": "rdb-mysql",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/iam-app-identity": {
+      "component": "iam-app-identity",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/object-bucket": {
+      "component": "object-bucket",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/container-registry": {
+      "component": "container-registry",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/bastion": {
+      "component": "bastion",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "modules/flux": {
+      "component": "flux",
       "changelog-path": "CHANGELOG.md"
     }
   }

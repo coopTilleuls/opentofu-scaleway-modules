@@ -12,7 +12,7 @@ tuning fin par défaut diffèrent.
 
 ```hcl
 module "mysql" {
-  source = "git::https://<repo-url>//modules/rdb-mysql?ref=vX.Y.Z"
+  source = "git::https://<repo-url>//modules/rdb-mysql?ref=rdb-mysql-vX.Y.Z"
 
   name               = "mysql-api-${terraform.workspace}"
   project_id         = var.project_id
