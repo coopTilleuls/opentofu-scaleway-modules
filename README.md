@@ -19,6 +19,7 @@ propre à chaque repo consommateur.
 | [`object-bucket`](modules/object-bucket) | Bucket Object Storage + policy (accès SRE + accès applicatif scopé) |
 | [`container-registry`](modules/container-registry) | Namespace Container Registry |
 | [`bastion`](modules/bastion) | Instance bastion SSH/DBA sur private network |
+| [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
 
 Chaque module a son propre `README.md` avec un exemple d'utilisation et les
 particularités à connaître.
@@ -38,7 +39,10 @@ particularités à connaître.
   accidentel.
 - **Aucune ressource Kubernetes** (namespace, RBAC, ingress, Helm release, manifest...) dans ces
   modules : c'est une exigence explicite du périmètre, ces objets restent gérés directement dans
-  chaque repo consommateur.
+  chaque repo consommateur. **Exception assumée : le module [`flux`](modules/flux)**, dont le
+  bootstrap est indissociable de ressources Kubernetes (namespace, secrets, CRD
+  `GitRepository`/`Kustomization`) — un module flux qui les exclurait n'aurait aucune substance.
+  Voir son README pour le détail de cette exception et de ses limites.
 
 ## Consommation depuis un repo applicatif
 
