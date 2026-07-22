@@ -74,7 +74,12 @@ locals {
     Sid    = "ApplicationScopedAccess"
     Effect = "Allow"
     Principal = {
-      SCW = "application_id:${var.app_application_id}"
+      # Liste à un élément (et non une chaîne nue) pour que ce statement ait exactement la même
+      # forme que sre_statement (Principal.SCW = list(string)) : concat() de deux objets dont un
+      # attribut a des types différents (string vs list(string)) fait planter OpenTofu dès que
+      # l'une des deux valeurs est encore inconnue au plan (ex: application_id d'une ressource
+      # créée dans le même apply) — cf panic "Error in function call" sur concat(seqs...).
+      SCW = ["application_id:${var.app_application_id}"]
     }
     Action = var.app_actions
     Resource = [
