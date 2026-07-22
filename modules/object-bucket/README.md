@@ -36,6 +36,9 @@ module "velero_bucket" {
 
   sre_group_id        = data.scaleway_iam_group.sre.id
   app_application_id  = module.velero_identity.application_id
+  # module.velero_identity est créé dans ce même apply : sa valeur n'est pas encore connue au
+  # plan, donc à passer explicitement plutôt que de laisser ce module la déduire (voir remarque).
+  enable_app_access   = true
 }
 ```
 
@@ -46,6 +49,12 @@ module "velero_bucket" {
   `scaleway_object_bucket` (tags de type S3).
 - Si ni `sre_group_id`, ni `app_application_id`, ni `additional_policy_statements` ne sont
   renseignés, aucune `scaleway_object_bucket_policy` n'est créée (bucket sans policy explicite).
+- **`enable_app_access`/`enable_sre_access`** : par défaut (`null`), la présence du statement
+  correspondant est déduite de `xxx_id != null`. Cette déduction échoue avec `Invalid count
+  argument` si `xxx_id` référence une ressource créée dans ce même apply (son ID n'est pas encore
+  connu au moment du plan) — typiquement `app_application_id = module.xxx_identity.application_id`
+  quand `iam-app-identity` est appelé dans le même apply, l'usage le plus courant de ce module.
+  Passer `enable_app_access = true` (littéral, donc toujours connu) contourne le problème.
 - `sre_group_id` résout le groupe via `data.scaleway_iam_group` et construit `Principal.SCW`
   comme une **liste de `user_id:<id>`** (un par membre du groupe), pas `"group_id:<id>"` : les deux
   repos d'origine évitent systématiquement ce dernier format (jamais éprouvé en production d'après
