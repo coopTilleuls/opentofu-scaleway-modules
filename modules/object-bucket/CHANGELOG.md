@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.1...object-bucket-v1.0.2) (2026-07-22)
+
+
+### Bug Fixes
+
+* **object-bucket:** make app_statement.Principal.SCW a list, matching sre_statement's shape ([b80fd71](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b80fd713526c53818ebdcc3bfa101095bdce0f5a))
+
 ## [1.0.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.0...object-bucket-v1.0.1) (2026-07-22)
 
 
