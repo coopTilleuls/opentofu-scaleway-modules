@@ -34,8 +34,19 @@ resource "scaleway_object_bucket" "this" {
   }
 }
 
+locals {
+  # var.xxx_id == null serait "unknown" (donc invalide dans un count/for_each) si xxx_id provient
+  # d'une ressource créée dans le même apply (ex: application IAM produite par le module
+  # `iam-app-identity` juste au-dessus) : sa valeur n'est pas encore connue au moment du plan, mais
+  # Terraform/OpenTofu ne peut pas non plus garantir statiquement qu'elle ne sera pas `null`. Les
+  # variables enable_sre_access/enable_app_access permettent à l'appelant de trancher explicitement
+  # (littéral, donc toujours connu) plutôt que de laisser ce module le déduire de la valeur de l'ID.
+  sre_enabled = var.enable_sre_access != null ? var.enable_sre_access : var.sre_group_id != null
+  app_enabled = var.enable_app_access != null ? var.enable_app_access : var.app_application_id != null
+}
+
 data "scaleway_iam_group" "sre" {
-  count = var.sre_group_id != null ? 1 : 0
+  count = local.sre_enabled ? 1 : 0
 
   group_id = var.sre_group_id
 }
@@ -46,7 +57,7 @@ locals {
   # sources résolvent systématiquement le groupe en la liste des `user_id:` de ses membres (jamais
   # `group_id:<id>`, jamais éprouvé en production d'après leurs propres commentaires : "pas de
   # groupe pour l'instant, il faudra surveiller les news").
-  sre_statement = var.sre_group_id == null ? [] : [{
+  sre_statement = local.sre_enabled ? [{
     Sid    = "SreFullAccess"
     Effect = "Allow"
     Principal = {
@@ -57,9 +68,9 @@ locals {
       scaleway_object_bucket.this.name,
       "${scaleway_object_bucket.this.name}/*",
     ]
-  }]
+  }] : []
 
-  app_statement = var.app_application_id == null ? [] : [{
+  app_statement = local.app_enabled ? [{
     Sid    = "ApplicationScopedAccess"
     Effect = "Allow"
     Principal = {
@@ -70,7 +81,7 @@ locals {
       scaleway_object_bucket.this.name,
       "${scaleway_object_bucket.this.name}/*",
     ]
-  }]
+  }] : []
 
   policy_statements = concat(local.sre_statement, local.app_statement, var.additional_policy_statements)
 }

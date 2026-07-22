@@ -47,6 +47,18 @@ variable "sre_group_id" {
   default     = null
 }
 
+variable "enable_sre_access" {
+  description = <<-EOT
+    Force explicitement la présence (`true`) ou l'absence (`false`) du statement SRE, indépendamment
+    de la valeur de `sre_group_id`. Laisser à null (défaut) pour déduire automatiquement de
+    `sre_group_id != null` — ce qui échoue avec "Invalid count argument" si `sre_group_id` provient
+    d'une ressource créée dans ce même apply (sa valeur n'est alors pas encore connue au plan).
+    Passer `true` explicitement dans ce cas.
+  EOT
+  type        = bool
+  default     = null
+}
+
 variable "sre_actions" {
   description = "Actions S3 accordées au groupe SRE."
   type        = list(string)
@@ -59,6 +71,17 @@ variable "app_application_id" {
     accès scopé au bucket. Laisser à null pour ne pas ajouter ce statement.
   EOT
   type        = string
+  default     = null
+}
+
+variable "enable_app_access" {
+  description = <<-EOT
+    Équivalent de `enable_sre_access` pour `app_application_id`. À passer explicitement à `true`
+    quand `app_application_id` référence une application IAM créée dans le même apply (cas le plus
+    courant : ce module est presque toujours associé à `iam-app-identity` dans le même apply, voir
+    l'exemple du README).
+  EOT
+  type        = bool
   default     = null
 }
 
