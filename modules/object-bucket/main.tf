@@ -61,7 +61,12 @@ locals {
     Sid    = "SreFullAccess"
     Effect = "Allow"
     Principal = {
-      SCW = [for user_id in data.scaleway_iam_group.sre[0].user_ids : "user_id:${user_id}"]
+      # tolist() : sans ça, ce for-expression produit un tuple de taille fixe (arité = nombre de
+      # membres du groupe), un type cty différent du tuple à 1 élément de app_statement. concat()
+      # de deux objets dont un attribut a des tuples de tailles différentes fait planter OpenTofu
+      # dès que l'une des deux valeurs est encore inconnue au plan (ex: application_id d'une
+      # ressource créée dans le même apply) — cf panic "Error in function call" sur concat(seqs...).
+      SCW = tolist([for user_id in data.scaleway_iam_group.sre[0].user_ids : "user_id:${user_id}"])
     }
     Action = var.sre_actions
     Resource = [
@@ -74,12 +79,9 @@ locals {
     Sid    = "ApplicationScopedAccess"
     Effect = "Allow"
     Principal = {
-      # Liste à un élément (et non une chaîne nue) pour que ce statement ait exactement la même
-      # forme que sre_statement (Principal.SCW = list(string)) : concat() de deux objets dont un
-      # attribut a des types différents (string vs list(string)) fait planter OpenTofu dès que
-      # l'une des deux valeurs est encore inconnue au plan (ex: application_id d'une ressource
-      # créée dans le même apply) — cf panic "Error in function call" sur concat(seqs...).
-      SCW = ["application_id:${var.app_application_id}"]
+      # tolist() : voir le commentaire équivalent sur sre_statement.SCW (même type cty list(string)
+      # des deux côtés, indépendamment du nombre d'éléments).
+      SCW = tolist(["application_id:${var.app_application_id}"])
     }
     Action = var.app_actions
     Resource = [
