@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.2...object-bucket-v1.0.3) (2026-07-22)
+
+
+### Bug Fixes
+
+* **object-bucket:** tolist() on both Principal.SCW to avoid mismatched tuple arities ([a4c306c](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/a4c306ca6e090b815017dbb7b5158c15b3f84d91))
+
 ## [1.0.2](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.1...object-bucket-v1.0.2) (2026-07-22)
 
 
