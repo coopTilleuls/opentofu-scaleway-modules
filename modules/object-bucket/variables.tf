@@ -21,6 +21,19 @@ variable "versioning_enabled" {
   default     = false
 }
 
+variable "prevent_destroy" {
+  description = <<-EOT
+    Protège le bucket contre une destruction via `tofu apply`/`destroy` accidentel. `false` par
+    défaut pour ne pas changer le comportement des consommateurs existants de ce module. `lifecycle.
+    prevent_destroy` doit être une constante littérale (impossible de référencer une variable) :
+    ce module crée donc en interne deux ressources `scaleway_object_bucket` mutuellement
+    exclusives (`count`), une par valeur de ce booléen — transparent pour l'appelant, qui ne voit
+    que les outputs `bucket_*`.
+  EOT
+  type        = bool
+  default     = false
+}
+
 variable "lifecycle_rules" {
   description = <<-EOT
     Règles de cycle de vie du bucket (expiration des objets / des versions non courantes).
