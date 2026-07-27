@@ -44,6 +44,11 @@ module "velero_bucket" {
 
 ## Remarques
 
+- `prevent_destroy = true` protège le bucket contre une destruction via `tofu apply`/`destroy`
+  accidentel. `false` par défaut (aucun des deux repos d'origine ne protégeait ses buckets via ce
+  module). Comme `lifecycle.prevent_destroy` doit être une constante littérale (ne peut pas
+  référencer une variable), ce module crée en interne deux ressources `scaleway_object_bucket`
+  mutuellement exclusives (`count`), une par valeur de ce booléen — transparent pour l'appelant.
 - `tags` attend une **map** clé/valeur (`{ project = "myproject" }`), contrairement à la plupart
   des autres ressources Scaleway qui attendent une liste de chaînes — c'est une particularité de
   `scaleway_object_bucket` (tags de type S3).

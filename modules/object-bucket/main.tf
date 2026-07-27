@@ -1,4 +1,10 @@
+# `lifecycle.prevent_destroy` doit être une constante littérale : impossible de la piloter par
+# `var.prevent_destroy` sur une seule ressource. On crée donc deux ressources mutuellement
+# exclusives (`count`), une par valeur possible de `var.prevent_destroy`, et `local.bucket`
+# (ci-dessous) expose la seule des deux qui existe réellement au reste du module.
 resource "scaleway_object_bucket" "this" {
+  count = var.prevent_destroy ? 0 : 1
+
   name       = var.name
   project_id = var.project_id
   tags       = var.tags
@@ -32,6 +38,52 @@ resource "scaleway_object_bucket" "this" {
       }
     }
   }
+}
+
+resource "scaleway_object_bucket" "protected" {
+  count = var.prevent_destroy ? 1 : 0
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  name       = var.name
+  project_id = var.project_id
+  tags       = var.tags
+
+  dynamic "versioning" {
+    for_each = var.versioning_enabled ? [true] : []
+    content {
+      enabled = true
+    }
+  }
+
+  dynamic "lifecycle_rule" {
+    for_each = var.lifecycle_rules
+    content {
+      id      = lifecycle_rule.value.id
+      enabled = lifecycle_rule.value.enabled
+      prefix  = lifecycle_rule.value.prefix
+
+      dynamic "expiration" {
+        for_each = lifecycle_rule.value.expiration_days != null ? [lifecycle_rule.value.expiration_days] : []
+        content {
+          days = expiration.value
+        }
+      }
+
+      dynamic "noncurrent_version_expiration" {
+        for_each = lifecycle_rule.value.noncurrent_version_expiration_days != null ? [lifecycle_rule.value.noncurrent_version_expiration_days] : []
+        content {
+          noncurrent_days = noncurrent_version_expiration.value
+        }
+      }
+    }
+  }
+}
+
+locals {
+  bucket = one(concat(scaleway_object_bucket.this, scaleway_object_bucket.protected))
 }
 
 locals {
@@ -70,8 +122,8 @@ locals {
     }
     Action = var.sre_actions
     Resource = [
-      scaleway_object_bucket.this.name,
-      "${scaleway_object_bucket.this.name}/*",
+      local.bucket.name,
+      "${local.bucket.name}/*",
     ]
   }] : []
 
@@ -85,8 +137,8 @@ locals {
     }
     Action = var.app_actions
     Resource = [
-      scaleway_object_bucket.this.name,
-      "${scaleway_object_bucket.this.name}/*",
+      local.bucket.name,
+      "${local.bucket.name}/*",
     ]
   }] : []
 
@@ -96,7 +148,7 @@ locals {
 resource "scaleway_object_bucket_policy" "this" {
   count = length(local.policy_statements) > 0 ? 1 : 0
 
-  bucket     = scaleway_object_bucket.this.name
+  bucket     = local.bucket.name
   project_id = var.project_id
   policy = jsonencode({
     Version   = "2023-04-17"
