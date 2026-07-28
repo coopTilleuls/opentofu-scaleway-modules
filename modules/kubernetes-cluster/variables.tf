@@ -91,30 +91,39 @@ variable "open_id_connect_config" {
   default = null
 }
 
+variable "zones" {
+  description = <<-EOT
+    Zones Scaleway sur lesquelles démultiplier chaque famille de pools : le module crée une
+    `scaleway_k8s_pool` par combinaison famille (`pools[*].name`) × taille (`pools[*].sizes`) × zone.
+  EOT
+  type        = list(string)
+}
+
 variable "pools" {
   description = <<-EOT
-    Pools de nodes à créer, indexés par un nom logique (ex: "default", "web", "spot"). Une seule
-    entrée peut suffire (cas simple : un pool par zone), ou une matrice plus riche (taille/type/zone/
-    taints par pool, cas des clusters multi-usages avec des pools dédiés et des taints).
+    Familles de pools de nodes. Chaque famille est démultipliée automatiquement sur `var.zones` et
+    sur chacune de ses `sizes` (une `scaleway_k8s_pool` par combinaison famille × taille × zone).
+    Cas simple : une famille avec une seule taille dans `sizes`. Cas matrice riche (clusters
+    multi-usages) : plusieurs familles, chacune avec plusieurs `sizes`, taints et labels différents.
+
+    `autoscaling`, `autohealing`, `container_runtime`, `public_ip_disabled`, ainsi que `size` et
+    `min_size` (figés à 0), ne sont pas paramétrables : le module suppose systématiquement un
+    autoscaler actif qui pilote seul la taille réelle du pool depuis sa création.
   EOT
-  type = map(object({
-    zone                   = string
-    node_type              = string
-    size                   = number
-    min_size               = optional(number, 0)
-    max_size               = optional(number)
-    autoscaling            = optional(bool, true)
-    autohealing            = optional(bool, true)
-    container_runtime      = optional(string, "containerd")
-    root_volume_size_in_gb = optional(number, 20)
-    public_ip_disabled     = optional(bool, true)
-    tags                   = optional(list(string), [])
-    labels                 = optional(map(string), {})
+  type = list(object({
+    name   = string
+    tags   = optional(list(string), [])
+    labels = optional(map(string), {})
     taints = optional(list(object({
       key    = string
       value  = string
       effect = string
     })), [])
+    sizes = list(object({
+      node_type              = string
+      max_per_zone           = number
+      root_volume_size_in_gb = optional(number, 20)
+    }))
   }))
 }
 

@@ -32,14 +32,16 @@ module "kubernetes" {
     required_claim = ["project_path=group/project"]
   }
 
-  pools = {
-    default = {
-      zone     = "fr-par-1"
-      node_type = "PRO2-XXS"
-      size      = 1
-      max_size  = 2
-    }
-  }
+  zones = ["fr-par-1", "fr-par-2", "fr-par-3"]
+
+  pools = [
+    {
+      name = "default"
+      sizes = [
+        { node_type = "PRO2-XXS", max_per_zone = 2 },
+      ]
+    },
+  ]
 
   # Force l'attente de la propagation réseau avant de créer les pools.
   network_dependencies = [module.vpc.gateway_network_ids]
@@ -55,10 +57,16 @@ module "kubernetes" {
 - `prevent_destroy = true` est figé en dur sur le cluster : un cluster de production ne doit pas
   pouvoir être détruit par un `tofu apply`/`destroy` accidentel. Le désactiver nécessite d'éditer
   ce module.
-- `pools` accepte aussi bien un pool simple par zone (cas `ffspt`) qu'une matrice riche
-  zone × taille × taints (cas `sweeek`) : c'est un simple `map(object(...))`, la logique de
-  génération de la matrice reste à la charge du module appelant si besoin (`for`/`merge` dans
-  les `locals` du repo consommateur).
+- `pools` est une liste de familles de pools (nom + taints/labels + tailles) ; le module
+  démultiplie lui-même chaque famille sur `var.zones` et sur ses `sizes` (une `scaleway_k8s_pool`
+  par combinaison famille × taille × zone). `autoscaling`, `autohealing`, `container_runtime`,
+  `public_ip_disabled`, ainsi que `size`/`min_size` (figés à `0`), ne sont pas paramétrables : le
+  module suppose systématiquement un autoscaler actif qui pilote seul la taille réelle du pool
+  depuis sa création.
+- Le nom réel du pool (argument `name`) inclut un hash de `root_volume_size_in_gb` (seul attribut
+  encore variable et `ForceNew` du provider) pour garantir que l'ancien et le nouveau pool n'ont
+  jamais le même nom pendant la fenêtre de `create_before_destroy` — la clé du pool dans
+  `pool_ids` (sortie), elle, reste stable et n'inclut pas ce hash.
 - `network_dependencies` sert uniquement à forcer, via `depends_on`, l'attente de la fin de
   création du réseau/de la gateway avant les pools (contourne un délai de propagation de route
   observé en production).

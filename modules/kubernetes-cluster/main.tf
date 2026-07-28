@@ -62,8 +62,32 @@ resource "time_sleep" "wait_after_network" {
   create_duration = "${var.wait_after_network_seconds}s"
 }
 
+locals {
+  # Aplatit chaque famille de pool sur ses tailles et sur var.zones (une scaleway_k8s_pool par
+  # combinaison famille × taille × zone). `slug` sert de clé for_each : il ne doit PAS contenir le
+  # hash de root_volume_size_in_gb (voir plus bas), sous peine de casser le create_before_destroy
+  # (Terraform traiterait un changement de taille de volume comme un add+destroy non ordonné sur
+  # deux adresses de resource distinctes, plutôt qu'un remplacement de la même adresse).
+  zonal_sized_pools = flatten([
+    for pool in var.pools : [
+      for size in pool.sizes : [
+        for zone in var.zones : {
+          slug                   = "${pool.name}-${lower(replace(size.node_type, "-", ""))}-${regex("[0-9]+$", zone)}"
+          zone                   = zone
+          node_type              = size.node_type
+          max_per_zone           = size.max_per_zone
+          root_volume_size_in_gb = size.root_volume_size_in_gb
+          tags                   = pool.tags
+          labels                 = pool.labels
+          taints                 = pool.taints
+        }
+      ]
+    ]
+  ])
+}
+
 resource "scaleway_k8s_pool" "this" {
-  for_each = var.pools
+  for_each = { for p in local.zonal_sized_pools : p.slug => p }
 
   depends_on = [time_sleep.wait_after_network]
 
@@ -74,20 +98,33 @@ resource "scaleway_k8s_pool" "this" {
   }
 
   cluster_id = scaleway_k8s_cluster.this.id
-  name       = each.key
-  zone       = each.value.zone
-  node_type  = each.value.node_type
+  # Le hash du seul attribut ForceNew encore variable ici (root_volume_size_in_gb) garantit que
+  # l'ancien et le nouveau pool n'ont jamais le même nom pendant la fenêtre de
+  # create_before_destroy, alors que `slug` (sans hash, voir le local ci-dessus) reste stable.
+  name = "${each.value.slug}-${substr(md5("${each.value.root_volume_size_in_gb}"), 0, 4)}"
+  zone = each.value.zone
 
-  size                   = each.value.size
-  min_size               = each.value.min_size
-  max_size               = coalesce(each.value.max_size, each.value.size)
-  autoscaling            = each.value.autoscaling
-  autohealing            = each.value.autohealing
-  container_runtime      = each.value.container_runtime
+  node_type = each.value.node_type
+
+  # Toujours 0 : l'autoscaler (toujours actif ci-dessous) pilote seul la taille réelle du pool
+  # depuis sa création ; un size/min_size non nul au provisioning déroute son calcul du plancher.
+  size        = 0
+  min_size    = 0
+  max_size    = each.value.max_per_zone
+  autoscaling = true
+  autohealing = true
+
+  container_runtime      = "containerd"
   root_volume_size_in_gb = each.value.root_volume_size_in_gb
-  public_ip_disabled     = each.value.public_ip_disabled
+  public_ip_disabled     = true
 
-  tags = concat(var.tags, each.value.tags)
+  # "scw-compute-image" (provisionnement plus rapide des nodes) est systématique sur les deux
+  # repos sources, d'où son ajout en dur ici plutôt que via var.tags.
+  tags = concat(
+    ["zone=${each.value.zone}", "scw-compute-image"],
+    var.tags,
+    each.value.tags
+  )
 
   # `taints` est un bloc répétable côté provider Scaleway (et non un argument de type liste).
   dynamic "taints" {
