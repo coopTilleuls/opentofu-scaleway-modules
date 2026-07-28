@@ -80,6 +80,9 @@ locals {
           tags                   = pool.tags
           labels                 = pool.labels
           taints                 = pool.taints
+          # Seule la famille "default" (présence garantie par la validation de var.pools) reçoit
+          # size=1 à la création : voir le commentaire sur `size` plus bas.
+          is_default = pool.name == "default"
         }
       ]
     ]
@@ -106,10 +109,11 @@ resource "scaleway_k8s_pool" "this" {
 
   node_type = each.value.node_type
 
-  # size=1 requis à la création : l'API Scaleway refuse qu'un cluster Kapsule ait 0 nodes au
-  # total, donc size=0 échoue systématiquement à la création du premier pool. min_size reste à 0
-  # pour laisser l'autoscaler (toujours actif ci-dessous) redescendre ensuite si besoin.
-  size        = 1
+  # size=1 requis à la création sur la famille "default" (et elle seule) : l'API Scaleway refuse
+  # qu'un cluster Kapsule ait 0 nodes au total, donc size=0 échoue systématiquement s'il n'y a
+  # jamais eu de node. Les autres familles démarrent à 0. min_size reste à 0 pour laisser
+  # l'autoscaler (toujours actif ci-dessous) redescendre ensuite si besoin.
+  size        = each.value.is_default ? 1 : 0
   min_size    = 0
   max_size    = each.value.max_per_zone
   autoscaling = true
