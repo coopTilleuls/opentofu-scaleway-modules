@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v2.0.0...kubernetes-cluster-v2.0.1) (2026-07-28)
+
+
+### Bug Fixes
+
+* **kubernetes-cluster:** size=1 requis à la création, Scaleway refuse 0 node ([78feb85](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/78feb850ce5ca502ae7f2b852769e4d9695a402c))
+
 ## [2.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v1.0.0...kubernetes-cluster-v2.0.0) (2026-07-28)
 
 
