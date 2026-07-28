@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v2.0.1...kubernetes-cluster-v3.0.0) (2026-07-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **kubernetes-cluster:** var.pools doit obligatoirement contenir une famille nommée "default", validé par une contrainte sur la variable.
+
+### Bug Fixes
+
+* **kubernetes-cluster:** size=1 uniquement sur la famille de pool "default" ([7ebc538](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/7ebc5384d25e35dc6a7db7decb4fa19b45a890f3))
+
 ## [2.0.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v2.0.0...kubernetes-cluster-v2.0.1) (2026-07-28)
 
 
