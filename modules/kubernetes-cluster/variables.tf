@@ -106,9 +106,13 @@ variable "pools" {
     Cas simple : une famille avec une seule taille dans `sizes`. Cas matrice riche (clusters
     multi-usages) : plusieurs familles, chacune avec plusieurs `sizes`, taints et labels différents.
 
-    `autoscaling`, `autohealing`, `container_runtime`, `public_ip_disabled`, ainsi que `size` et
-    `min_size` (figés à 0), ne sont pas paramétrables : le module suppose systématiquement un
-    autoscaler actif qui pilote seul la taille réelle du pool depuis sa création.
+    Une famille nommée exactement "default" est obligatoire : c'est la seule à démarrer avec
+    size=1 (les autres démarrent à 0), l'API Scaleway refusant qu'un cluster Kapsule ait 0 nodes
+    au total.
+
+    `autoscaling`, `autohealing`, `container_runtime`, `public_ip_disabled`, ainsi que `min_size`
+    (figé à 0), ne sont pas paramétrables : le module suppose systématiquement un autoscaler actif
+    qui pilote seul la taille réelle du pool une fois créé.
   EOT
   type = list(object({
     name   = string
@@ -125,6 +129,11 @@ variable "pools" {
       root_volume_size_in_gb = optional(number, 20)
     }))
   }))
+
+  validation {
+    condition     = contains([for pool in var.pools : pool.name], "default")
+    error_message = "var.pools doit contenir une famille nommée \"default\" (c'est elle qui démarre avec size=1, requis par l'API Scaleway pour qu'un cluster Kapsule ait au moins un node)."
+  }
 }
 
 variable "pool_upgrade_policy" {
