@@ -20,6 +20,7 @@ propre à chaque repo consommateur.
 | [`container-registry`](modules/container-registry) | Namespace Container Registry |
 | [`bastion`](modules/bastion) | Instance bastion SSH/DBA sur private network |
 | [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
+| [`cockpit-alerting`](modules/cockpit-alerting) | Alerting Mimir d'un Cockpit Scaleway (alertes préconfigurées patchées + règles custom, routage OnCall) |
 
 Chaque module a son propre `README.md` avec un exemple d'utilisation et les
 particularités à connaître.

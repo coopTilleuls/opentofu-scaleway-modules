@@ -38,6 +38,10 @@
     "modules/flux": {
       "component": "flux",
       "changelog-path": "CHANGELOG.md"
+    },
+    "modules/cockpit-alerting": {
+      "component": "cockpit-alerting",
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }
