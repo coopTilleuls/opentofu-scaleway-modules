@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.3...object-bucket-v1.1.0) (2026-07-28)
+
+
+### Features
+
+* **object-bucket:** add prevent_destroy toggle ([6335ec0](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/6335ec065aea92a46afabe97bc09ac0ad083c4fc))
+
 ## [1.0.3](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.2...object-bucket-v1.0.3) (2026-07-22)
 
 
