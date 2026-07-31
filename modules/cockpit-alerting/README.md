@@ -55,7 +55,7 @@ module "cockpit_alerting" {
           comparaison = ">"
           annotations = { summary = "High Memory usage on RDB PostgreSQL™ {{ $labels.resource_name }} cluster." }
           description = "PostgreSQL™ {{ $labels.instance }} node on instance {{ $labels.resource_name }} - {{ $labels.resource_id }} has a memory usage superior to THRESHOLD% since DURATION"
-          runbook_url = "https://wiki.lt-mut-prod.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomPostgreSQL/Memory"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomPostgreSQL/Memory"
         },
       ]
     }
