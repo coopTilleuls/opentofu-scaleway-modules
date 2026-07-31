@@ -420,7 +420,7 @@ locals {
             try(local.predefined_alerts_usage[group][alert.name].expression_replacement_2, "SHOULD_NOT_BE_USED")
           )
           annotations = alert.annotations
-          runbook_url = "https://wiki.lt-mut-prod.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/${replace(group, "/[^a-zA-Z]/", "")}/${replace(alert.name, "/[^a-zA-Z]/", "")}"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/${replace(group, "/[^a-zA-Z]/", "")}/${replace(alert.name, "/[^a-zA-Z]/", "")}"
           # patch description avec regex "to THRESHOLD% since DURATION"
           description = replace(
             alert.annotations.description,
