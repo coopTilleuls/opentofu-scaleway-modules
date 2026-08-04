@@ -31,6 +31,13 @@ resource "scaleway_instance_server" "this" {
   zone       = var.zone
   tags       = var.tags
 
+  dynamic "root_volume" {
+    for_each = var.root_volume_size_gb != null ? [var.root_volume_size_gb] : []
+    content {
+      size_in_gb = root_volume.value
+    }
+  }
+
   additional_volume_ids = var.additional_volume_size_gb > 0 ? [scaleway_block_volume.this[0].id] : []
 
   user_data = var.user_data
