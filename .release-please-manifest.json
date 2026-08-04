@@ -7,6 +7,6 @@
   "modules/object-bucket": "1.1.0",
   "modules/container-registry": "1.0.0",
   "modules/flux": "1.0.0",
-  "modules/bastion": "1.0.0",
+  "modules/bastion": "1.1.0",
   "modules/cockpit-alerting": "1.0.1"
 }
