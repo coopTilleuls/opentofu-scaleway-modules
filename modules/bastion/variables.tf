@@ -31,6 +31,12 @@ variable "private_network_id" {
   type        = string
 }
 
+variable "root_volume_size_gb" {
+  description = "Taille (en Go) du volume racine du bastion. Laisser à null pour utiliser la taille par défaut de l'offre Scaleway."
+  type        = number
+  default     = null
+}
+
 variable "additional_volume_size_gb" {
   description = "Taille (en Go) d'un volume additionnel à attacher au bastion. `0` pour ne pas en créer."
   type        = number

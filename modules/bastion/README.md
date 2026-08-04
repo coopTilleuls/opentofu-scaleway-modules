@@ -43,6 +43,9 @@ module "bastion" {
   différentes (`ubuntu_noble` côté `sweeek`, `debian_trixie` côté `ffspt`).
 - L'IP publique (`scaleway_instance_ip`) a `prevent_destroy = true` : c'est un point d'entrée
   connu (whitelisté côté firewall, référencé en DNS...) qui ne doit pas disparaître par erreur.
+- `root_volume_size_gb = null` (défaut) laisse Scaleway choisir la taille par défaut de l'offre
+  pour le volume racine. Le définir dimensionne explicitement ce volume (ex: migration nécessitant
+  plus d'espace disque sur le rootfs).
 - `additional_volume_size_gb = 0` (défaut) ne crée aucun volume additionnel.
 - `ansible_playbook_path = null` (défaut) : Ansible n'est pas exécuté, le bastion n'est configuré
   que par `user_data`. Le définir active un `null_resource` qui attend la fin de cloud-init
