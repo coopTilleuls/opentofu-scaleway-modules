@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v3.0.0...kubernetes-cluster-v4.0.0) (2026-08-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **kubernetes-cluster:** la clé for_each (`slug`) des pools change de format (tirets -> underscores), ce qui déplace l'adresse `scaleway_k8s_pool.this[...]` pour tout consommateur ayant déjà appliqué une version antérieure du module.
+
+### Bug Fixes
+
+* **kubernetes-cluster:** pool slug/name en underscore, pas en tiret ([2818596](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/2818596a1135430f7940f629a93970bcf07665e6))
+
 ## [3.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v2.0.1...kubernetes-cluster-v3.0.0) (2026-07-28)
 
 
