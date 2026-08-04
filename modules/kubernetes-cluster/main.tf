@@ -72,7 +72,11 @@ locals {
     for pool in var.pools : [
       for size in pool.sizes : [
         for zone in var.zones : {
-          slug                   = "${pool.name}-${lower(replace(size.node_type, "-", ""))}-${regex("[0-9]+$", zone)}"
+          # Underscore-joined, sans les "_" internes de node_type : reproduit le schéma de nommage
+          # des ressources scaleway_k8s_pool brutes préexistantes, pour que `name` (ci-dessous) ne
+          # change pas de valeur lors d'une migration vers ce module (sans quoi, `name` étant
+          # ForceNew côté API Scaleway, tous les pools seraient recréés).
+          slug                   = "${pool.name}_${replace(lower(size.node_type), "_", "")}_${regex("[0-9]+$", zone)}"
           zone                   = zone
           node_type              = size.node_type
           max_per_zone           = size.max_per_zone
@@ -104,7 +108,7 @@ resource "scaleway_k8s_pool" "this" {
   # Le hash du seul attribut ForceNew encore variable ici (root_volume_size_in_gb) garantit que
   # l'ancien et le nouveau pool n'ont jamais le même nom pendant la fenêtre de
   # create_before_destroy, alors que `slug` (sans hash, voir le local ci-dessus) reste stable.
-  name = "${each.value.slug}-${substr(md5("${each.value.root_volume_size_in_gb}"), 0, 4)}"
+  name = "${each.value.slug}_${substr(md5("${each.value.root_volume_size_in_gb}"), 0, 4)}"
   zone = each.value.zone
 
   node_type = each.value.node_type
