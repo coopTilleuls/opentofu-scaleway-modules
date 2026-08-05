@@ -72,11 +72,13 @@ locals {
     for pool in var.pools : [
       for size in pool.sizes : [
         for zone in var.zones : {
-          # Underscore-joined, sans les "_" internes de node_type : reproduit le schéma de nommage
-          # des ressources scaleway_k8s_pool brutes préexistantes, pour que `name` (ci-dessous) ne
-          # change pas de valeur lors d'une migration vers ce module (sans quoi, `name` étant
-          # ForceNew côté API Scaleway, tous les pools seraient recréés).
-          slug                   = "${pool.name}_${replace(lower(size.node_type), "_", "")}_${regex("[0-9]+$", zone)}"
+          # Underscore-joined, sans les "_" ni "-" internes de node_type : reproduit le schéma de
+          # nommage des ressources scaleway_k8s_pool brutes préexistantes, pour que `name`
+          # (ci-dessous) ne change pas de valeur lors d'une migration vers ce module (sans quoi,
+          # `name` étant ForceNew côté API Scaleway, tous les pools seraient recréés). Les node_type
+          # Scaleway réels (ex: "PRO2-XXS") utilisent des tirets, qu'il faut donc retirer en plus
+          # des "_" pour ne jamais laisser de tiret dans le slug.
+          slug                   = "${pool.name}_${replace(lower(size.node_type), "/[_-]/", "")}_${regex("[0-9]+$", zone)}"
           zone                   = zone
           node_type              = size.node_type
           max_per_zone           = size.max_per_zone
