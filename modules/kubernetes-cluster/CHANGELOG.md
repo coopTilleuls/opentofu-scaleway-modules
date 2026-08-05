@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v4.0.0...kubernetes-cluster-v5.0.0) (2026-08-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **kubernetes-cluster:** la clé for_each (`slug`) des pools change de format pour tout node_type contenant un tiret, ce qui déplace l'adresse `scaleway_k8s_pool.this[...]` pour tout consommateur ayant déjà appliqué une version antérieure du module avec un tel node_type.
+
+### Bug Fixes
+
+* **kubernetes-cluster:** retirer aussi les tirets du node_type dans le slug ([454061d](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/454061dd53aa9987a6d0ad752f8f776057df2140))
+
 ## [4.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v3.0.0...kubernetes-cluster-v4.0.0) (2026-08-04)
 
 
