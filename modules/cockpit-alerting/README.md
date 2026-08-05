@@ -43,6 +43,12 @@ module "cockpit_alerting" {
   logs_retention_days    = 30
   traces_retention_days  = 15
 
+  # optionnel, valeurs par défaut ci-dessous ; à surcharger uniquement pour importer une source
+  # préexistante sans recréation (rappel : `name` est ForceNew côté provider Scaleway)
+  metrics_name = "metrics-source"
+  logs_name    = "logs-source"
+  traces_name  = "traces-source"
+
   custom_rules_groups = [
     {
       name = "Custom - PostgreSQL"

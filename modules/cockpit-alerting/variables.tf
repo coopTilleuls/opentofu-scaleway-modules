@@ -27,6 +27,29 @@ variable "traces_retention_days" {
   default     = 15
 }
 
+variable "metrics_name" {
+  description = <<-EOT
+    Nom de la source Cockpit de métriques. `name` est `ForceNew` côté provider Scaleway : ne changer
+    cette valeur que si vous acceptez un destroy+create de la source. Par défaut à `"metrics-source"`
+    pour ne pas changer le comportement des appelants existants ; à surcharger avec le nom réel (ex.
+    `"Scaleway Metrics"`) uniquement pour importer une source par défaut préexistante sans recréation.
+  EOT
+  type        = string
+  default     = "metrics-source"
+}
+
+variable "logs_name" {
+  description = "Nom de la source Cockpit de logs. Voir `metrics_name` pour la remarque ForceNew."
+  type        = string
+  default     = "logs-source"
+}
+
+variable "traces_name" {
+  description = "Nom de la source Cockpit de traces. Voir `metrics_name` pour la remarque ForceNew."
+  type        = string
+  default     = "traces-source"
+}
+
 variable "is_production" {
   description = <<-EOT
     Détermine l'escalade par défaut de la route d'alerte (`oncall_24_7` si `true`, `oncall_7_5`
