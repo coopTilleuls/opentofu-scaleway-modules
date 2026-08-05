@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/vpc-v1.0.0...vpc-v1.1.0) (2026-08-05)
+
+
+### Features
+
+* **vpc:** support enable_smtp on public gateways ([afe6238](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/afe62384f7caa4c72dde254733dfe2c782deb9d4))
+
 ## 1.0.0 (2026-07-21)
 
 
