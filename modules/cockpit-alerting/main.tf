@@ -2,7 +2,7 @@
 resource "scaleway_cockpit_source" "metrics" {
   project_id     = var.project_id
   region         = var.region
-  name           = "metrics-source"
+  name           = var.metrics_name
   type           = "metrics"
   retention_days = var.metrics_retention_days
 }
@@ -10,7 +10,7 @@ resource "scaleway_cockpit_source" "metrics" {
 resource "scaleway_cockpit_source" "logs" {
   project_id     = var.project_id
   region         = var.region
-  name           = "logs-source"
+  name           = var.logs_name
   type           = "logs"
   retention_days = var.logs_retention_days
 }
@@ -18,7 +18,7 @@ resource "scaleway_cockpit_source" "logs" {
 resource "scaleway_cockpit_source" "traces" {
   project_id     = var.project_id
   region         = var.region
-  name           = "traces-source"
+  name           = var.traces_name
   type           = "traces"
   retention_days = var.traces_retention_days
 }
