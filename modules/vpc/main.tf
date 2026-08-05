@@ -45,12 +45,13 @@ resource "scaleway_vpc_public_gateway_ip" "gateway" {
 resource "scaleway_vpc_public_gateway" "this" {
   for_each = local.gateway_instances
 
-  name       = "${var.name}-${each.value.gateway_key}-${each.value.zone}"
-  zone       = each.value.zone
-  type       = each.value.type
-  ip_id      = scaleway_vpc_public_gateway_ip.gateway[each.key].id
-  project_id = var.project_id
-  tags       = var.tags
+  name        = "${var.name}-${each.value.gateway_key}-${each.value.zone}"
+  zone        = each.value.zone
+  type        = each.value.type
+  ip_id       = scaleway_vpc_public_gateway_ip.gateway[each.key].id
+  project_id  = var.project_id
+  tags        = var.tags
+  enable_smtp = each.value.enable_smtp
 }
 
 resource "scaleway_ipam_ip" "gateway" {

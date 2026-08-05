@@ -46,6 +46,9 @@ variable "public_gateways" {
     type                = optional(string, "VPC-GW-S")
     enable_masquerade   = optional(bool, true)
     push_default_route  = optional(bool, true)
+    # Scaleway bloque les ports SMTP (25, 465, 587, 2465) sortants par défaut sur les Public
+    # Gateways (anti-spam). Cf https://www.scaleway.com/en/docs/transactional-email/troubleshooting/smtp-connection/#solution.
+    enable_smtp = optional(bool, false)
   }))
   default = {}
 }
