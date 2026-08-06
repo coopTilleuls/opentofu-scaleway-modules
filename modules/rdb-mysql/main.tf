@@ -51,8 +51,7 @@ resource "scaleway_rdb_instance" "this" {
 
   # `null` (et non une map vide) quand l'appelant ne fournit rien : `settings` est un attribut
   # optional+computed côté provider, une map vide explicite écraserait à chaque apply les réglages
-  # déjà présents sur l'instance (ex: ceux fixés par défaut par Scaleway), ce que sweeek (seul repo
-  # source à avoir du MySQL managé) ne faisait jamais (il ne renseignait pas `settings`).
+  # déjà présents sur l'instance (ex: ceux fixés par défaut par Scaleway).
   settings = length(var.settings) > 0 ? var.settings : null
 
   tags = var.tags

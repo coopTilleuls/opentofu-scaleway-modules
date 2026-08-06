@@ -65,4 +65,4 @@ module "velero_bucket" {
   repos d'origine évitent systématiquement ce dernier format (jamais éprouvé en production d'après
   leurs propres commentaires), et résolvent toujours le groupe en membres individuels.
 - `additional_policy_statements` permet d'ajouter un statement ad hoc (ex: le statement "lead
-  developer" observé dans `ffspt/.../dump.tf`) sans complexifier l'interface du module.
+  developer") sans complexifier l'interface du module.

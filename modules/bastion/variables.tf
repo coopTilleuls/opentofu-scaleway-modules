@@ -70,7 +70,7 @@ variable "ansible_playbook_path" {
     bastion via SSH juste après son démarrage. Laisser à null (défaut) pour ne pas exécuter
     Ansible : le bastion reste alors uniquement configuré par `user_data` (cloud-init).
 
-    Motif repris de opentofu-ffspt : la configuration ré-appliquable (comptes utilisateurs...) est
+    la configuration ré-appliquable (comptes utilisateurs...) est
     mieux gérée par un playbook Ansible idempotent, ré-exécuté à chaque changement (piloté par
     `ansible_triggers`), que par du cloud-init qui ne s'exécute qu'une seule fois au premier boot.
   EOT

@@ -107,7 +107,7 @@ variable "app_actions" {
 variable "additional_policy_statements" {
   description = <<-EOT
     Statements de policy IAM Scaleway supplémentaires, au format brut attendu par
-    `scaleway_object_bucket_policy` (ex: le statement "lead developer" du repo `ffspt`). Permet de
+    `scaleway_object_bucket_policy` (ex: le statement "lead developer"). Permet de
     couvrir un besoin ponctuel sans complexifier l'interface de ce module.
   EOT
   type        = list(any)

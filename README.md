@@ -1,8 +1,8 @@
 # opentofu-scaleway-modules
 
 Modules OpenTofu réutilisables pour l'infrastructure Scaleway, extraits de la
-duplication constatée entre les repos `sweeek` (walibuy) et `opentofu-ffspt`
-(ffsportpourtous). L'objectif : mutualiser le code d'infrastructure Scaleway
+duplication constatée entre differents repos.
+L'objectif : mutualiser le code d'infrastructure Scaleway
 générique, sans jamais porter la gestion des objets Kubernetes applicatifs
 (namespaces, RBAC, ingress, Helm releases...), qui reste volontairement
 propre à chaque repo consommateur.
@@ -56,7 +56,7 @@ module "vpc" {
 }
 ```
 
-L'intégration dans les repos `sweeek` et `opentofu-ffspt` (remplacement du code dupliqué par des
+L'intégration dans les repos client (remplacement du code dupliqué par des
 appels à ces modules, choix des tags de version) est gérée séparément, hors périmètre de ce repo.
 
 ## Publication des releases
