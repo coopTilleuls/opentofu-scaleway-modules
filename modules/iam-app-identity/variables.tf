@@ -23,7 +23,7 @@ variable "permission_set_names" {
 variable "iam_group_id" {
   description = <<-EOT
     ID d'un groupe IAM existant auquel rattacher l'application (motif observé pour la clé CI
-    GitLab de sweeek : application membre du groupe "LeadDeveloper", sans policy dédiée). Laisser
+    GitLab d’un client : application membre du groupe "LeadDeveloper", sans policy dédiée). Laisser
     à null (défaut) pour ne pas rattacher l'application à un groupe.
   EOT
   type        = string

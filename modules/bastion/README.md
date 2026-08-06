@@ -25,7 +25,7 @@ module "bastion" {
   }
 
   # Ansible : la configuration ré-appliquable (comptes utilisateurs...), reprise du motif utilisé
-  # dans opentofu-ffspt (2_environments/4_bastion/ansible/playbook.yml + group_vars/bastion.yml
+  # dans un repo client (2_environments/4_bastion/ansible/playbook.yml + group_vars/bastion.yml
   # + roles/users). Ré-exécuté à chaque `tofu apply` où l'un des triggers change, sans recréer le
   # bastion.
   ansible_playbook_path   = "${path.root}/ansible/playbook.yml"
@@ -40,7 +40,7 @@ module "bastion" {
 ## Remarques
 
 - `image` n'a pas de valeur par défaut : les deux repos d'origine utilisent des images
-  différentes (`ubuntu_noble` côté `sweeek`, `debian_trixie` côté `ffspt`).
+  différentes (`ubuntu_noble`, `debian_trixie`).
 - L'IP publique (`scaleway_instance_ip`) a `prevent_destroy = true` : c'est un point d'entrée
   connu (whitelisté côté firewall, référencé en DNS...) qui ne doit pas disparaître par erreur.
 - `root_volume_size_gb = null` (défaut) laisse Scaleway choisir la taille par défaut de l'offre
