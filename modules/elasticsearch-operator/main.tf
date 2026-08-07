@@ -23,14 +23,49 @@ locals {
 
 # Cf https://github.com/hashicorp/terraform/issues/29729#issuecomment-2138367809
 resource "kubernetes_manifest" "crd" {
-  for_each = local.crd_manifests
+  for_each = local.crd_manifests_patched
 
   manifest = each.value
 }
 
 resource "kubernetes_manifest" "operator" {
   depends_on = [kubernetes_manifest.crd]
-  for_each   = local.operator_manifests
+  for_each   = local.operator_manifests_patched
 
   manifest = each.value
+}
+
+# Patches manuels : si var.patch_dir est renseignée, tout fichier <Kind>--<name>.yml qu'elle
+# contient est appliqué en strategic merge patch (mêmes règles qu'un `kubectl patch
+# --type=strategic`, ex: les containers sont fusionnés par leur "name", pas par index) sur le
+# manifest correspondant, qu'il vienne des CRD ou de l'operator.
+locals {
+  eck_manifests_raw = merge(local.crd_manifests, local.operator_manifests)
+
+  eck_patch_files = var.patch_dir == null ? [] : fileset(var.patch_dir, "*.yml")
+  eck_patches = {
+    for f in local.eck_patch_files :
+    trimsuffix(f, ".yml") => f
+    if contains(keys(local.eck_manifests_raw), trimsuffix(f, ".yml"))
+  }
+}
+
+data "external" "eck_patch" {
+  for_each = local.eck_patches
+
+  program = ["${path.module}/scripts/strategic-merge-patch.sh"]
+  query = {
+    base  = jsonencode(local.eck_manifests_raw[each.key])
+    patch = file("${var.patch_dir}/${each.value}")
+  }
+}
+
+locals {
+  eck_manifests_patched = {
+    for key, manifest in local.eck_manifests_raw :
+    key => contains(keys(local.eck_patches), key) ? jsondecode(data.external.eck_patch[key].result.merged) : manifest
+  }
+
+  crd_manifests_patched      = { for key, manifest in local.crd_manifests : key => local.eck_manifests_patched[key] }
+  operator_manifests_patched = { for key, manifest in local.operator_manifests : key => local.eck_manifests_patched[key] }
 }
