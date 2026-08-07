@@ -19,6 +19,7 @@ module "elasticsearch_operator" {
   source = "git::https://<repo-url>//modules/elasticsearch-operator?ref=elasticsearch-operator-vX.Y.Z"
 
   eck_version = "3.5.0"
+  patch_dir   = "${path.root}/patches/elasticsearch-operator"
 
   providers = {
     kubernetes = kubernetes
@@ -47,3 +48,10 @@ les credentials du cluster cible, typiquement à partir des outputs du module `k
 - Les manifests CRD sont appliqués avant ceux de l'operator (`depends_on`), comme pour l'operator
   RabbitMQ dans les repos consommateurs (même contrainte d'ordre : les CRD doivent exister avant
   que le contrôleur ne démarre).
+- `patch_dir` permet, comme pour l'operator RabbitMQ dans les repos consommateurs, de patcher un
+  manifest (CRD ou operator) sans forker ce module : tout fichier `<Kind>--<name>.yml` du
+  répertoire est appliqué en strategic merge patch (mêmes règles qu'un `kubectl patch
+  --type=strategic`) sur le manifest correspondant. Le répertoire est fourni par le repo
+  consommateur (ex: `patches/elasticsearch-operator` à sa racine) — ce module ne fait aucune
+  hypothèse sur son contenu ni sur une éventuelle distinction prod/nonprod, à la charge de
+  l'appelant s'il en a besoin.

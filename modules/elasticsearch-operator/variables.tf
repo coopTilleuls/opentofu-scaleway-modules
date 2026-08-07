@@ -8,3 +8,14 @@ variable "eck_version" {
   EOT
   type        = string
 }
+
+variable "patch_dir" {
+  description = <<-EOT
+    Chemin (fourni par le repo consommateur, ex: "$${path.root}/patches/elasticsearch-operator")
+    vers un répertoire contenant des fichiers de patch nommés "<Kind>--<name>.yml" (ex:
+    "StatefulSet--elastic-operator.yml"). Chaque fichier est appliqué en strategic merge patch sur
+    le manifest CRD ou operator correspondant. `null` (défaut) désactive tout patch.
+  EOT
+  type        = string
+  default     = null
+}
