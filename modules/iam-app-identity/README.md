@@ -25,7 +25,7 @@ module "velero_identity" {
 }
 ```
 
-Autre motif observé (clé CI GitLab de sweeek) : une application simplement rattachée à un groupe
+Autre motif observé (clé CI GitLab d’un client) : une application simplement rattachée à un groupe
 IAM existant, sans policy dédiée — laisser `permission_set_names` vide et renseigner
 `iam_group_id` :
 

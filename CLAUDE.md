@@ -7,10 +7,7 @@ the repo, not documented there.
 ## What this repo is
 
 Terraform/OpenTofu modules for Scaleway infrastructure, extracted from real duplication between
-two consumer repos:
-
-- `opentofu-ffspt` — `git@github.com:coopTilleuls/opentofu-ffspt.git`
-- `sweeek`'s `opentofu-scaleway-k8s` — `git@gitlab.com:alicesgarden/walisoft/les-tilleuls.coop/opentofu-scaleway-k8s.git`
+some consumer repos.
 
 Every module here is meant to be a faithful superset of what both repos actually do in
 production, not a green-field redesign. That framing matters for how you validate changes (below).

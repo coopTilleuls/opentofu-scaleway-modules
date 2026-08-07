@@ -5,8 +5,8 @@
 
 ### Features
 
-* **bastion:** optional Ansible provisioning, mirroring opentofu-ffspt ([d08e20b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/d08e20ba69e18ed3e13bdc2fd043a229ac608a4d))
-* **flux:** add module mirroring Flux bootstrap from opentofu-ffspt and sweeek ([2fe59aa](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/2fe59aada47b178a91e3d8a32e01d438d81a465d))
+* **bastion:** optional Ansible provisioning ([d08e20b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/d08e20ba69e18ed3e13bdc2fd043a229ac608a4d))
+* **flux:** add module mirroring Flux bootstrap ([2fe59aa](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/2fe59aada47b178a91e3d8a32e01d438d81a465d))
 
 
 ### Bug Fixes
