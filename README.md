@@ -21,6 +21,7 @@ propre à chaque repo consommateur.
 | [`bastion`](modules/bastion) | Instance bastion SSH/DBA sur private network |
 | [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
 | [`cockpit-alerting`](modules/cockpit-alerting) | Alerting Mimir d'un Cockpit Scaleway (alertes préconfigurées patchées + règles custom, routage OnCall) |
+| [`elasticsearch-operator`](modules/elasticsearch-operator) | Installation de l'operator ECK (Elastic Cloud on Kubernetes) — **exception au périmètre** ci-dessous |
 
 Chaque module a son propre `README.md` avec un exemple d'utilisation et les
 particularités à connaître.
@@ -40,10 +41,12 @@ particularités à connaître.
   accidentel.
 - **Aucune ressource Kubernetes** (namespace, RBAC, ingress, Helm release, manifest...) dans ces
   modules : c'est une exigence explicite du périmètre, ces objets restent gérés directement dans
-  chaque repo consommateur. **Exception assumée : le module [`flux`](modules/flux)**, dont le
+  chaque repo consommateur. **Exceptions assumées : les modules [`flux`](modules/flux)**, dont le
   bootstrap est indissociable de ressources Kubernetes (namespace, secrets, CRD
-  `GitRepository`/`Kustomization`) — un module flux qui les exclurait n'aurait aucune substance.
-  Voir son README pour le détail de cette exception et de ses limites.
+  `GitRepository`/`Kustomization`), **et [`elasticsearch-operator`](modules/elasticsearch-operator)**,
+  qui installe l'operator ECK (CRD + manifests officiels) — dans les deux cas, un module qui
+  exclurait ces objets n'aurait aucune substance. Voir leur README respectif pour le détail de ces
+  exceptions et de leurs limites.
 
 ## Consommation depuis un repo applicatif
 

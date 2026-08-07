@@ -42,6 +42,10 @@
     "modules/cockpit-alerting": {
       "component": "cockpit-alerting",
       "changelog-path": "CHANGELOG.md"
+    },
+    "modules/elasticsearch-operator": {
+      "component": "elasticsearch-operator",
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }
