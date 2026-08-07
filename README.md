@@ -62,6 +62,33 @@ module "vpc" {
 L'intégration dans les repos client (remplacement du code dupliqué par des
 appels à ces modules, choix des tags de version) est gérée séparément, hors périmètre de ce repo.
 
+## Ajouter un nouveau module
+
+1. Créer `modules/<nom-du-module>/` avec la structure habituelle : `main.tf`, `variables.tf`,
+   `outputs.tf`, `versions.tf` (bloc `terraform.required_providers`, sans bloc `provider`, cf
+   [Conventions](#conventions)), et un `README.md` (rôle du module, exemple d'utilisation,
+   remarques). Ne pas créer de `CHANGELOG.md` : il est généré par release-please (cf
+   [Publication des releases](#publication-des-releases)).
+2. Si le module crée des ressources Kubernetes, l'indiquer explicitement comme exception au
+   périmètre (cf [Conventions](#conventions)) : mention dans le `README.md` du module, et dans
+   ce README (ligne du tableau ci-dessus + paragraphe "Aucune ressource Kubernetes").
+3. Ajouter une ligne au tableau [Modules disponibles](#modules-disponibles) ci-dessus.
+4. Enregistrer le module dans release-please, dans les deux fichiers à la racine du repo :
+   - `release-please-config.json` : ajouter une entrée `"modules/<nom-du-module>": {"component":
+     "<nom-du-module>", "changelog-path": "CHANGELOG.md"}`.
+   - `.release-please-manifest.json` : ajouter `"modules/<nom-du-module>": "0.0.0"` (version de
+     départ avant toute release — release-please calculera la première version réelle, typiquement
+     `1.0.0`, à partir des commits).
+5. Valider avec `tofu fmt -recursive` puis, dans le répertoire du module, `tofu init
+   -backend=false && tofu validate` (cf [Validation](#validation)) ; supprimer ensuite
+   `.terraform/` et `.terraform.lock.hcl` générés par cette validation avant de commit.
+6. Committer avec un message conventionnel `feat(<nom-du-module>): ...` (déclenche un bump
+   *minor* côté release-please), ouvrir une PR et la merger sur `main`.
+7. release-please ouvre alors automatiquement une PR séparée
+   `chore(main): release <nom-du-module> X.Y.Z` avec le `CHANGELOG.md` du module ; la merger crée
+   le tag `<nom-du-module>-vX.Y.Z` et la release GitHub, immédiatement utilisable via
+   `ref=<nom-du-module>-vX.Y.Z` (cf [Consommation depuis un repo applicatif](#consommation-depuis-un-repo-applicatif)).
+
 ## Publication des releases
 
 Les tags et les releases GitHub sont générés automatiquement par
