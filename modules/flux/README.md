@@ -11,8 +11,8 @@ modules de ce repo est justement de ne jamais en créer (cf README racine). Exce
 car le bootstrap Flux est indissociable de ces objets — un module "flux" sans eux n'aurait aucune
 substance.
 
-**Ce module ne modernise pas le bootstrap** : il reprend tel quel le motif observé dans `sweeek`
-et `opentofu-ffspt` (CLI `flux install` en `local-exec`, pas le provider officiel
+**Ce module ne modernise pas le bootstrap** : il reprend tel quel le motif observé dans les repos 
+client (CLI `flux install` en `local-exec`, pas le provider officiel
 `fluxcd/flux`/`flux_bootstrap_git`, pas de provider `github`/`gitlab` pour la deploy key). Il
 hérite donc des mêmes contraintes opérationnelles que les repos d'origine (voir "Remarques").
 

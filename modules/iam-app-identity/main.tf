@@ -15,7 +15,7 @@ resource "scaleway_iam_api_key" "this" {
 
 resource "scaleway_iam_policy" "this" {
   # Absente dans le seul cas observé d'une application simplement rattachée à un groupe IAM
-  # existant (clé CI GitLab de sweeek, membre du groupe "LeadDeveloper" sans policy dédiée) :
+  # existant (clé CI GitLab d’un client, membre du groupe "LeadDeveloper" sans policy dédiée) :
   # ce cas est couvert par `iam_group_id` ci-dessous plutôt que par une policy redondante avec
   # les droits du groupe.
   count = length(var.permission_set_names) > 0 ? 1 : 0
@@ -35,7 +35,7 @@ resource "scaleway_iam_policy" "this" {
 }
 
 resource "scaleway_iam_group_membership" "this" {
-  # Motif observé pour la clé CI GitLab de sweeek : application rattachée à un groupe IAM
+  # Motif observé pour la clé CI GitLab d’un client : application rattachée à un groupe IAM
   # existant (ex: "LeadDeveloper") pour hériter de ses droits, sans policy dédiée.
   count = var.iam_group_id != null ? 1 : 0
 

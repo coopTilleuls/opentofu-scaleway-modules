@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v1.0.1...cockpit-alerting-v1.1.0) (2026-08-05)
+
+
+### Features
+
+* **cockpit-alerting:** rendre les noms des sources Cockpit configurables ([e10b138](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/e10b13838dfad306cee8b8ce05a6645f8b095bb9))
+* **cockpit-alerting:** rendre les noms des sources Cockpit configurables ([d3a8c2a](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/d3a8c2a5f5ccca6a717981861b12c4d61979a04b))
+
 ## [1.0.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v1.0.0...cockpit-alerting-v1.0.1) (2026-07-31)
 
 
