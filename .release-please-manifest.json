@@ -9,5 +9,5 @@
   "modules/flux": "1.0.0",
   "modules/bastion": "1.1.0",
   "modules/cockpit-alerting": "1.1.0",
-  "modules/elasticsearch-operator": "0.0.0"
+  "modules/elasticsearch-operator": "1.0.0"
 }
