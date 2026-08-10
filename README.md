@@ -22,6 +22,7 @@ propre à chaque repo consommateur.
 | [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
 | [`cockpit-alerting`](modules/cockpit-alerting) | Alerting Mimir d'un Cockpit Scaleway (alertes préconfigurées patchées + règles custom, routage OnCall) |
 | [`elasticsearch-operator`](modules/elasticsearch-operator) | Installation de l'operator ECK (Elastic Cloud on Kubernetes) — **exception au périmètre** ci-dessous |
+| [`rabbitmq-operator`](modules/rabbitmq-operator) | Installation des operators RabbitMQ (Cluster Operator + Messaging Topology Operator) — **exception au périmètre** ci-dessous |
 
 Chaque module a son propre `README.md` avec un exemple d'utilisation et les
 particularités à connaître.
@@ -43,10 +44,12 @@ particularités à connaître.
   modules : c'est une exigence explicite du périmètre, ces objets restent gérés directement dans
   chaque repo consommateur. **Exceptions assumées : les modules [`flux`](modules/flux)**, dont le
   bootstrap est indissociable de ressources Kubernetes (namespace, secrets, CRD
-  `GitRepository`/`Kustomization`), **et [`elasticsearch-operator`](modules/elasticsearch-operator)**,
-  qui installe l'operator ECK (CRD + manifests officiels) — dans les deux cas, un module qui
-  exclurait ces objets n'aurait aucune substance. Voir leur README respectif pour le détail de ces
-  exceptions et de leurs limites.
+  `GitRepository`/`Kustomization`), **[`elasticsearch-operator`](modules/elasticsearch-operator)**,
+  qui installe l'operator ECK (CRD + manifests officiels), **et
+  [`rabbitmq-operator`](modules/rabbitmq-operator)**, qui installe les operators RabbitMQ (Cluster
+  Operator + Messaging Topology Operator) — dans les trois cas, un module qui exclurait ces objets
+  n'aurait aucune substance. Voir leur README respectif pour le détail de ces exceptions et de leurs
+  limites.
 
 ## Consommation depuis un repo applicatif
 
