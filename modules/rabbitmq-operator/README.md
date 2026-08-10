@@ -2,7 +2,8 @@
 
 Installe les operators [RabbitMQ Cluster Operator](https://github.com/rabbitmq/cluster-operator) et
 [RabbitMQ Messaging Topology Operator](https://github.com/rabbitmq/messaging-topology-operator)
-sur un cluster Kubernetes déjà provisionné (typiquement par le module
+(cf [vue d'ensemble](https://www.rabbitmq.com/kubernetes/operator/operator-overview)) sur un
+cluster Kubernetes déjà provisionné (typiquement par le module
 [`kubernetes-cluster`](../kubernetes-cluster)) : CRD + operator (namespace `rabbitmq-system`, RBAC,
 `Deployment`) pour le premier, puis CRD + operator (variante "with-certmanager", webhook de
 validation) pour le second, téléchargés directement depuis les releases GitHub officielles pour les
