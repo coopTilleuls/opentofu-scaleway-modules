@@ -21,8 +21,11 @@ propre à chaque repo consommateur.
 | [`bastion`](modules/bastion) | Instance bastion SSH/DBA sur private network |
 | [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
 | [`cockpit-alerting`](modules/cockpit-alerting) | Alerting Mimir d'un Cockpit Scaleway (alertes préconfigurées patchées + règles custom, routage OnCall) |
-| [`elasticsearch-operator`](modules/elasticsearch-operator) | Installation de l'operator ECK (Elastic Cloud on Kubernetes) — **exception au périmètre** ci-dessous |
-| [`rabbitmq-operator`](modules/rabbitmq-operator) | Installation des operators RabbitMQ (Cluster Operator + Messaging Topology Operator) — **exception au périmètre** ci-dessous |
+
+Les modules d'installation d'operators Kubernetes (ECK, RabbitMQ...) vivent dans le repo
+compagnon [`opentofu-modules`](https://github.com/coopTilleuls/opentofu-modules), pas ici : c'est
+la seule catégorie d'exception au périmètre "pas de ressource Kubernetes" ci-dessous, et elle est
+désormais isolée dans son propre repo plutôt que mélangée à celui-ci.
 
 Chaque module a son propre `README.md` avec un exemple d'utilisation et les
 particularités à connaître.
@@ -42,14 +45,13 @@ particularités à connaître.
   accidentel.
 - **Aucune ressource Kubernetes** (namespace, RBAC, ingress, Helm release, manifest...) dans ces
   modules : c'est une exigence explicite du périmètre, ces objets restent gérés directement dans
-  chaque repo consommateur. **Exceptions assumées : les modules [`flux`](modules/flux)**, dont le
+  chaque repo consommateur. **Exception assumée : le module [`flux`](modules/flux)**, dont le
   bootstrap est indissociable de ressources Kubernetes (namespace, secrets, CRD
-  `GitRepository`/`Kustomization`), **[`elasticsearch-operator`](modules/elasticsearch-operator)**,
-  qui installe l'operator ECK (CRD + manifests officiels), **et
-  [`rabbitmq-operator`](modules/rabbitmq-operator)**, qui installe les operators RabbitMQ (Cluster
-  Operator + Messaging Topology Operator) — dans les trois cas, un module qui exclurait ces objets
-  n'aurait aucune substance. Voir leur README respectif pour le détail de ces exceptions et de leurs
-  limites.
+  `GitRepository`/`Kustomization`) — un module qui exclurait ces objets n'aurait aucune substance.
+  Voir son README pour le détail de cette exception et de ses limites. Les modules d'installation
+  d'operators Kubernetes (même logique d'exception, mais plus nombreux et plus proches entre eux)
+  vivent désormais dans le repo compagnon
+  [`opentofu-modules`](https://github.com/coopTilleuls/opentofu-modules).
 
 ## Consommation depuis un repo applicatif
 
@@ -72,9 +74,12 @@ appels à ces modules, choix des tags de version) est gérée séparément, hors
    [Conventions](#conventions)), et un `README.md` (rôle du module, exemple d'utilisation,
    remarques). Ne pas créer de `CHANGELOG.md` : il est généré par release-please (cf
    [Publication des releases](#publication-des-releases)).
-2. Si le module crée des ressources Kubernetes, l'indiquer explicitement comme exception au
-   périmètre (cf [Conventions](#conventions)) : mention dans le `README.md` du module, et dans
-   ce README (ligne du tableau ci-dessus + paragraphe "Aucune ressource Kubernetes").
+2. Si le module ne fait qu'installer un operator Kubernetes (CRD + manifests officiels), il
+   n'a pas sa place ici : il va dans le repo compagnon
+   [`opentofu-modules`](https://github.com/coopTilleuls/opentofu-modules). Si le module crée des
+   ressources Kubernetes pour une autre raison (cf le cas de [`flux`](modules/flux)), l'indiquer
+   explicitement comme exception au périmètre (cf [Conventions](#conventions)) : mention dans le
+   `README.md` du module, et dans ce README (paragraphe "Aucune ressource Kubernetes").
 3. Ajouter une ligne au tableau [Modules disponibles](#modules-disponibles) ci-dessus.
 4. Enregistrer le module dans release-please, dans les deux fichiers à la racine du repo :
    - `release-please-config.json` : ajouter une entrée `"modules/<nom-du-module>": {"component":
