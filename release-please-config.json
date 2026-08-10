@@ -46,6 +46,10 @@
     "modules/elasticsearch-operator": {
       "component": "elasticsearch-operator",
       "changelog-path": "CHANGELOG.md"
+    },
+    "modules/rabbitmq-operator": {
+      "component": "rabbitmq-operator",
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }
