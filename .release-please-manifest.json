@@ -10,5 +10,5 @@
   "modules/bastion": "1.1.0",
   "modules/cockpit-alerting": "1.1.0",
   "modules/elasticsearch-operator": "1.0.0",
-  "modules/rabbitmq-operator": "0.0.0"
+  "modules/rabbitmq-operator": "1.0.0"
 }
