@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v1.1.0...cockpit-alerting-v2.0.0) (2026-08-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cockpit-alerting:** callers must now pass webhook_url_critical, webhook_url_warning and webhook_url_info explicitly.
+
+### Bug Fixes
+
+* **cockpit-alerting:** remove hardcoded OnCall webhook URLs ([bcdd2ca](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/bcdd2ca1cbd5f44b707329fec57f5c30305b4e5f))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v1.0.1...cockpit-alerting-v1.1.0) (2026-08-05)
 
 
