@@ -5,8 +5,11 @@ et configure l'alerting Mimir associé : reprend chaque alerte préconfigurée
 Scaleway (`data.scaleway_cockpit_preconfigured_alert`), la filtre/patch via une
 table interne (`predefined_alerts_usage` — seuils warning/critical, expression,
 etc.), la fusionne avec des règles custom propres à l'appelant, et route le
-tout vers l'astreinte Grafana OnCall partagée Les Tilleuls
-(`oncall_0_0`/`oncall_7_5`/`oncall_24_7`) via `mimir_alertmanager_config`.
+tout vers des webhooks Alertmanager fournis par l'appelant
+(`webhook_url_info`/`webhook_url_warning`/`webhook_url_critical`) via
+`mimir_alertmanager_config`. Ces webhooks peuvent pointer vers n'importe quel
+système d'alerte exposant un endpoint Alertmanager (Grafana OnCall, PagerDuty,
+Opsgenie, etc.) — le module ne dépend d'aucun système en particulier.
 Motif dupliqué à l'identique entre plusieurs repos clients avant extraction
 ici.
 
@@ -37,6 +40,11 @@ module "cockpit_alerting" {
   project_id    = var.project_id
   region        = var.scw_region
   is_production = terraform.workspace == "prod"
+
+  # sensible : à passer via TF_VAR_webhook_url_* ou un backend de secrets, jamais en dur
+  webhook_url_critical = var.webhook_url_critical
+  webhook_url_warning  = var.webhook_url_warning
+  webhook_url_info     = var.webhook_url_info
 
   # optionnel, valeurs par défaut ci-dessous
   metrics_retention_days = 6
@@ -101,9 +109,10 @@ provider "mimir" {
   par alerte préconfigurée Scaleway) est figé dans ce module, pas exposé en
   variable : c'est la logique qu'on veut identique sur tous les projets.
   Seul `custom_rules_groups` varie par projet.
-- **`contact_points`/URLs OnCall** : astreinte Les Tilleuls partagée,
-  également figée en interne (pas de variable) — identique sur tous les
-  repos clients à ce jour.
+- **`webhook_url_critical`/`_warning`/`_info`** sont des variables
+  obligatoires et sensibles (`sensitive = true`) : ce module ne fixe plus
+  aucune URL de webhook en interne. À passer via `TF_VAR_...` ou un backend
+  de secrets — jamais en dur dans un fichier `.tfvars` versionné.
 - `custom_rules_groups` est typé en `list(any)` (pas de `object({...})`
   strict) vu la forme imbriquée et partiellement optionnelle de `rules` (cf.
   `variables.tf`).

@@ -29,20 +29,15 @@ data "scaleway_cockpit_preconfigured_alert" "all" {
 }
 
 locals {
-  # Rotation d'astreinte Les Tilleuls (Grafana OnCall), partagée entre projets clients.
-  oncall_24_7 = "https://oncall-prod-eu-west-0.grafana.net/oncall/integrations/v1/alertmanager/REDACTED-ONCALL-TOKEN/"
-  oncall_7_5  = "https://oncall-prod-eu-west-0.grafana.net/oncall/integrations/v1/alertmanager/REDACTED-ONCALL-TOKEN/"
-  oncall_0_0  = "https://oncall-prod-eu-west-0.grafana.net/oncall/integrations/v1/alertmanager/REDACTED-ONCALL-TOKEN/"
-
   contact_points = {
-    oncall_24_7 = {
-      url = var.is_production ? local.oncall_24_7 : local.oncall_7_5
+    critical = {
+      url = var.is_production ? var.webhook_url_critical : var.webhook_url_warning
     }
-    oncall_7_5 = {
-      url = local.oncall_7_5
+    warning = {
+      url = var.webhook_url_warning
     }
-    oncall_0_0 = {
-      url = local.oncall_0_0
+    info = {
+      url = var.webhook_url_info
     }
   }
 
@@ -443,7 +438,7 @@ resource "mimir_alertmanager_config" "this" {
   # TODO: routes, subroutes, group_by…
 
   route {
-    receiver = "oncall_0_0"
+    receiver = "info"
 
     // see https://www.robustperception.io/whats-the-difference-between-group_interval-group_wait-and-repeat_interval/
     // we set prometheus default values: https://prometheus.io/docs/alerting/latest/configuration/
@@ -456,7 +451,7 @@ resource "mimir_alertmanager_config" "this" {
       matchers = [
         "severity=\"warning\"",
       ]
-      receiver        = "oncall_7_5"
+      receiver        = "warning"
       group_wait      = "30s"
       group_interval  = "5m"
       repeat_interval = "1h"
@@ -466,7 +461,7 @@ resource "mimir_alertmanager_config" "this" {
       matchers = [
         "severity=\"critical\"",
       ]
-      receiver        = "oncall_24_7"
+      receiver        = "critical"
       group_wait      = "30s"
       group_interval  = "5m"
       repeat_interval = "20m"

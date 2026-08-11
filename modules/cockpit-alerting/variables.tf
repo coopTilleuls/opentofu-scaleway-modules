@@ -52,12 +52,37 @@ variable "traces_name" {
 
 variable "is_production" {
   description = <<-EOT
-    Détermine l'escalade par défaut de la route d'alerte (`oncall_24_7` si `true`, `oncall_7_5`
-    sinon). À passer explicitement par l'appelant (ex: `terraform.workspace == "prod"`) : ce module
-    ne lit jamais `terraform.workspace` lui-même.
+    Détermine quel webhook reçoit les alertes critiques (`webhook_url_critical` si `true`,
+    `webhook_url_warning` sinon). À passer explicitement par l'appelant (ex:
+    `terraform.workspace == "prod"`) : ce module ne lit jamais `terraform.workspace` lui-même.
   EOT
   type        = bool
   default     = false
+}
+
+variable "webhook_url_critical" {
+  description = <<-EOT
+    URL du webhook Alertmanager appelé pour les alertes `severity=critical` (et, si
+    `is_production = false`, utilisé à la place de `webhook_url_warning` pour la route par
+    défaut de sévérité critique). Compatible avec n'importe quel système d'alerte exposant un
+    endpoint webhook Alertmanager (Grafana OnCall, PagerDuty, Opsgenie, etc.). Sensible : ne pas
+    committer de valeur en dur, à passer via une variable d'environnement `TF_VAR_...` ou un
+    backend de secrets.
+  EOT
+  type        = string
+  sensitive   = true
+}
+
+variable "webhook_url_warning" {
+  description = "URL du webhook Alertmanager appelé pour les alertes `severity=warning`. Voir `webhook_url_critical` pour le format attendu et la remarque sur la sensibilité."
+  type        = string
+  sensitive   = true
+}
+
+variable "webhook_url_info" {
+  description = "URL du webhook Alertmanager appelé par la route par défaut (alertes sans routage explicite warning/critical). Voir `webhook_url_critical` pour le format attendu et la remarque sur la sensibilité."
+  type        = string
+  sensitive   = true
 }
 
 variable "custom_rules_groups" {
