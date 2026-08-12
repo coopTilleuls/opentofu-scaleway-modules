@@ -8,5 +8,6 @@
   "modules/container-registry": "1.0.0",
   "modules/flux": "1.0.0",
   "modules/bastion": "1.1.0",
-  "modules/cockpit-alerting": "2.0.0"
+  "modules/cockpit-alerting": "2.0.0",
+  "modules/external-secret": "0.0.0"
 }

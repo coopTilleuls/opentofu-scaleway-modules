@@ -21,6 +21,7 @@ propre à chaque repo consommateur.
 | [`bastion`](modules/bastion) | Instance bastion SSH/DBA sur private network |
 | [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
 | [`cockpit-alerting`](modules/cockpit-alerting) | Alerting Mimir d'un Cockpit Scaleway (alertes préconfigurées patchées + règles custom, routage OnCall) |
+| [`external-secret`](modules/external-secret) | Câblage Scaleway Secret Manager ↔ External Secrets Operator (IAM lecture seule, secret par namespace, SecretStore/ExternalSecret) — **exception au périmètre** ci-dessous |
 
 Les modules d'installation d'operators Kubernetes (ECK, RabbitMQ...) vivent dans le repo
 compagnon [`opentofu-modules`](https://github.com/coopTilleuls/opentofu-modules), pas ici : c'est
@@ -45,10 +46,12 @@ particularités à connaître.
   accidentel.
 - **Aucune ressource Kubernetes** (namespace, RBAC, ingress, Helm release, manifest...) dans ces
   modules : c'est une exigence explicite du périmètre, ces objets restent gérés directement dans
-  chaque repo consommateur. **Exception assumée : le module [`flux`](modules/flux)**, dont le
-  bootstrap est indissociable de ressources Kubernetes (namespace, secrets, CRD
-  `GitRepository`/`Kustomization`) — un module qui exclurait ces objets n'aurait aucune substance.
-  Voir son README pour le détail de cette exception et de ses limites. Les modules d'installation
+  chaque repo consommateur. **Exception assumée : les modules [`flux`](modules/flux)** et
+  [`external-secret`](modules/external-secret), dont le bootstrap respectif est indissociable de
+  ressources Kubernetes (namespace, secrets, CRD `GitRepository`/`Kustomization` pour `flux` ;
+  secret bootstrap, `SecretStore`/`ExternalSecret` pour `external-secret`) — un module qui
+  exclurait ces objets n'aurait aucune substance. Voir leur README respectif pour le détail de
+  cette exception et de ses limites. Les modules d'installation
   d'operators Kubernetes (même logique d'exception, mais plus nombreux et plus proches entre eux)
   vivent désormais dans le repo compagnon
   [`opentofu-modules`](https://github.com/coopTilleuls/opentofu-modules).
