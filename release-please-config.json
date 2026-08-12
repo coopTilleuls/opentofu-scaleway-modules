@@ -42,10 +42,6 @@
     "modules/cockpit-alerting": {
       "component": "cockpit-alerting",
       "changelog-path": "CHANGELOG.md"
-    },
-    "modules/external-secret": {
-      "component": "external-secret",
-      "changelog-path": "CHANGELOG.md"
     }
   }
 }
