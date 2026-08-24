@@ -59,6 +59,8 @@ variable "autoscaler_config" {
     ignore_daemonsets_utilization    = optional(bool, true)
     balance_similar_node_groups      = optional(bool, true)
     scale_down_utilization_threshold = optional(number, 0.9)
+    skip_nodes_with_local_storage    = optional(bool, false)
+    log_level                        = optional(number, 2)
   })
   default = {}
 }

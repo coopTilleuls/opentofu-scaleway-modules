@@ -27,6 +27,8 @@ resource "scaleway_k8s_cluster" "this" {
     ignore_daemonsets_utilization    = var.autoscaler_config.ignore_daemonsets_utilization
     balance_similar_node_groups      = var.autoscaler_config.balance_similar_node_groups
     scale_down_utilization_threshold = var.autoscaler_config.scale_down_utilization_threshold
+    skip_nodes_with_local_storage    = var.autoscaler_config.skip_nodes_with_local_storage
+    log_level                        = var.autoscaler_config.log_level
   }
 
   dynamic "auto_upgrade" {
