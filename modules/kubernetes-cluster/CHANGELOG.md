@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v5.0.0...kubernetes-cluster-v5.1.0) (2026-08-24)
+
+
+### Features
+
+* **kubernetes-cluster:** autoscaler config ([23fa44e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/23fa44e2009964fef8aa5cfa4532cf75e9174ed0))
+* **kubernetes-cluster:** empty commit ([b9de0ae](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b9de0aefa29669e7c517e5f3fe40bcbe8a32cae5))
+
 ## [5.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v4.0.0...kubernetes-cluster-v5.0.0) (2026-08-05)
 
 
