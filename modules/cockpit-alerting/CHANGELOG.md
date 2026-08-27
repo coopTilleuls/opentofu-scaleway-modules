@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.0.0...cockpit-alerting-v2.1.0) (2026-08-27)
+
+
+### Features
+
+* **kubernetes-cluster:** autoscaler config ([23fa44e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/23fa44e2009964fef8aa5cfa4532cf75e9174ed0))
+* **kubernetes-cluster:** empty commit ([b9de0ae](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b9de0aefa29669e7c517e5f3fe40bcbe8a32cae5))
+
+
+### Bug Fixes
+
+* **cockpit-alerting:** new serverless jobs alerts support ([9817c12](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/9817c1214c86ceaa49a3c62f5568402b48c42a57))
+
 ## [2.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v1.1.0...cockpit-alerting-v2.0.0) (2026-08-11)
 
 
