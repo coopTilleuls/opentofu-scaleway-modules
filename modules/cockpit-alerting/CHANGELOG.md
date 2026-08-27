@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.1.0...cockpit-alerting-v2.2.0) (2026-08-27)
+
+
+### Features
+
+* **cockpit-module:** add default additionnal monitors ([bdb5c05](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/bdb5c058f4ff8a75631699ed514601c896253ed3))
+
 ## [2.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.0.0...cockpit-alerting-v2.1.0) (2026-08-27)
 
 
