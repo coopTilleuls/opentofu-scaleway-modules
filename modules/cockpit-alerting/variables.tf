@@ -97,3 +97,8 @@ variable "custom_rules_groups" {
   type        = list(any)
   default     = []
 }
+
+variable "public_gateway_size" {
+  description = "Public gateway size (S/M/L/XL). used to monitor public gateway bandwidth usage until a metric gives the capacity"
+  type        = string
+}

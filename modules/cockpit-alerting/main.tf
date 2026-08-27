@@ -48,6 +48,12 @@ locals {
   # - description_regex and description_replacement
   # - comparaison : if need to change comparaison operator
 
+  public_gateway_bandwidth_mbps = {
+    "S" = 100,
+    "M" = 1000,
+    "L" = 3000,
+    "XL" = 10000
+  }
 
   predefined_alerts_usage = {
     # MySQL
@@ -402,6 +408,241 @@ locals {
   }
 
 
+  additionnal_rules_groups = [
+    # in summary or description: THRESHOLD and DURATION are replaced by their values
+
+    # ETCD
+    {
+      name = "Custom - ETCD"
+      rules = [
+        {
+          name = "Disk Quota"
+          threshold = {
+            # en %
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          expression  = "avg by(resource_name) (100 * kubernetes_cluster_etcdwatcher_namespace_usage{type=\"size\"} / kubernetes_cluster_etcdwatcher_namespace_quota{type=\"size\"})"
+          comparaison = ">"
+          annotations = {
+            summary = "High ETCD disk quota on {{ $labels.resource_name }} Kubernetes cluster."
+          }
+          description = "ETCD service of {{ $labels.resource_name }} Kubernetes API has a disk usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomETCD/DiskQuota"
+        },
+        {
+          name = "CPU Usage"
+          threshold = {
+            # en %
+            warning  = 60
+            critical = 80
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          # when controle plane is dedicated 4, no cpu limit, so default to 4 in usage calculation
+          expression  = "avg by (resource_name) (100 * (kubernetes_cluster_k8s_shoot_controlplane_cpu_usage{component=\"api-server\"} / kubernetes_cluster_k8s_shoot_controlplane_cpu_limit{component=\"api-server\"}) or (kubernetes_cluster_k8s_shoot_controlplane_cpu_usage{component=\"api-server\"} / 4))"
+          comparaison = ">"
+          annotations = {
+            summary = "High ETCD cpu usage on {{ $labels.resource_name }} Kubernetes cluster."
+          }
+          description = "ETCD service of {{ $labels.resource_name }} Kubernetes API has a CPU usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomETCD/CpuUsage"
+        },
+      ]
+    },
+
+    # S2S VPN
+    {
+      name = "Custom - S2S VPN"
+      rules = [
+        {
+          name = "Inbound bandwitch"
+          threshold = {
+            # en %
+            warning  = 80 / 2
+            critical = 90 / 2
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          expression  = "100 * sum by(resource_name) (rate(svpn_gateway_tunnel_received_bytes_count{}[5m])) / avg by(resource_name) (svpn_gateway_bandwidth_capacity_bps{})"
+          comparaison = ">"
+          annotations = {
+            summary = "High S2S VPN Inbound bandwidth on {{ $labels.resource_name }} VPN."
+          }
+          description = "S2S VPN Inbound bandwith on {{ $labels.resource_name }} is superior to THRESHOLD% since DURATION. The threshold is based on zone disturbtion tolerance."
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomS2SVPN/InboundBandwidth"
+        },
+        {
+          name = "Outbound bandwitch"
+          threshold = {
+            # en %
+            warning  = 80 / 2
+            critical = 90 / 2
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          expression  = "100 * sum by(resource_name) (rate(svpn_gateway_tunnel_sent_bytes_count{}[5m])) / avg by(resource_name) (svpn_gateway_bandwidth_capacity_bps{})"
+          comparaison = ">"
+          annotations = {
+            summary = "High S2S VPN Outbound bandwidth on {{ $labels.resource_name }} VPN."
+          }
+          description = "S2S VPN Outbound bandwith on {{ $labels.resource_name }} is superior to THRESHOLD% since DURATION. The threshold is based on zone disturbtion tolerance."
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomS2SVPN/OutboundBandwidth"
+        },
+      ]
+    },
+
+    # Public Gateway
+    {
+      name = "Custom - Public Gateway"
+      rules = [
+        {
+          name = "Inbound bandwitch"
+          threshold = {
+            # en %
+            warning  = 80 / 2
+            critical = 90 / 2
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          # TODO:                                                                based it on lb size
+          expression  = "100 * irate(public_gateway_receive_bytes_total{}[5m]) / ${local.public_gateway_bandwidth_mbps[var.public_gateway_size] * 1000 * 1000 / 8}"
+          comparaison = ">"
+          annotations = {
+            summary = "High Public Gateway Inbound bandwidth on {{ $labels.resource_name }} VPN."
+          }
+          description = "Public Gateway Inbound bandwith on {{ $labels.resource_name }} is superior to THRESHOLD% since DURATION. The threshold is based on zone disturbtion tolerance."
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomPublicGateway/InboundBandwidth"
+        },
+        {
+          name = "Outbound bandwitch"
+          threshold = {
+            # en %
+            warning  = 80 / 2
+            critical = 90 / 2
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          # TODO:                                                                based it on lb size
+          expression  = "100 * irate(public_gateway_transmit_bytes_total{}[5m]) / ${local.public_gateway_bandwidth_mbps[var.public_gateway_size] * 1000 * 1000 / 8}"
+          comparaison = ">"
+          annotations = {
+            summary = "High Public Gateway Outbound bandwidth on {{ $labels.resource_name }} VPN."
+          }
+          description = "Public Gateway Outbound bandwith on {{ $labels.resource_name }} is superior to THRESHOLD% since DURATION. The threshold is based on zone disturbtion tolerance."
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomPublicGateway/OutboundBandwidth"
+        },
+      ]
+    },
+
+    # PostgreSQL
+    {
+      name = "Custom - PostgreSQL"
+      rules = [
+        {
+          name = "Memory"
+          threshold = {
+            # en %
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "10m"
+            critical = "20m"
+          }
+          # TODO revoir
+          expression  = "100 - ((rdb_instance_postgresql_node_memory_MemAvailable_bytes{} * 100) / rdb_instance_postgresql_node_memory_MemTotal_bytes{})"
+          comparaison = ">"
+          annotations = {
+            summary = "High Memory usage on RDB PostgreSQL™ {{ $labels.resource_name }} cluster."
+          }
+          description = "PostgreSQL™ {{ $labels.instance }} node on instance {{ $labels.resource_name }} - {{ $labels.resource_id }} has a memory usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomPostgreSQL/Memory"
+        },
+      ]
+    },
+
+    # OpenSearch
+    {
+      name = "Custom - OpenSearch"
+      rules = [
+        {
+          name = "CPU"
+          threshold = {
+            # en %
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "10m"
+            critical = "20m"
+          }
+          expression  = "avg by(node, service) (sedb_deployment_opensearch_process_cpu_percent)"
+          comparaison = ">"
+          annotations = {
+            summary = "High CPU usage on node {{ $labels.node }} of OpenSearch cluster."
+          }
+          description = "OpenSearch node {{ $labels.node }} has a CPU usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/CPU"
+        },
+        {
+          name = "Memory"
+          threshold = {
+            # en %
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "10m"
+            critical = "20m"
+          }
+          expression = "100 - sedb_deployment_opensearch_os_mem_free_percent"
+          comparaison = ">"
+          annotations = {
+            summary = "High Memory usage on node {{ $labels.node }} of OpenSearch cluster {{ $labels.resource_name }} service {{ $labels.service }}."
+          }
+          description = "OpenSearch node {{ $labels.node }} of cluster {{ $labels.resource_name}}, for service {{ $labels.service }},  has a Memory usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/Memory"
+        },
+        {
+          name = "Load average"
+          threshold = {
+            # en %
+            warning  = 1
+            critical = 2
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          expression  = "sedb_deployment_opensearch_os_load_average_five_minutes"
+          comparaison = ">"
+          annotations = {
+            summary = "High Load average usage on node {{ $labels.node }} of OpenSearch cluster."
+          }
+          description = "OpenSearch node {{ $labels.node }} has a Load average usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/LoadAverage"
+        },
+        # TODO: en attente case scaleway pour metrique utilisation disque
+      ]
+    }
+  ]
+
+
   # Creation des alertes custom a partir de celles proposees par Scaleway
   # on les prend depuis data.scaleway_cockpit_preconfigured_alert.all
   # on les groupe par product_family - product_name
@@ -442,7 +683,7 @@ locals {
     }
   ]
 
-  all_custom_rules_groups = concat(local.custom_rules_groups_from_predefined, var.custom_rules_groups)
+  all_custom_rules_groups = concat(local.custom_rules_groups_from_predefined, local.additionnal_rules_groups, var.custom_rules_groups)
 }
 
 # La configuration d'alert manager se fait via le provider mimir :
