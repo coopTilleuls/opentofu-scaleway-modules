@@ -174,6 +174,18 @@ locals {
       }
     }
 
+    "Serverless Compute - Serverless Jobs" = {
+      "JobRunHighMemoryUsage" = {
+        enabled = "false"
+      }
+      "JobRunHighCPUUsage" = {
+        enabled = "false"
+      }
+      "JobRunFailed" = {
+        enabled = "false"
+      }
+    }
+
     "Data & Analytics - Data Warehouse" = {
       # DataWarehouse
       "DataWarehouseHighCPUUsage" = {
