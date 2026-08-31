@@ -622,8 +622,8 @@ locals {
           name = "Load average"
           threshold = {
             # en %
-            warning  = 1
-            critical = 2
+            warning  = 3
+            critical = 5
           }
           duration = {
             warning  = "10m"
