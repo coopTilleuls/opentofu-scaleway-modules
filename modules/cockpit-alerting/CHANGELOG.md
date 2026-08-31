@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.2.0...cockpit-alerting-v2.2.1) (2026-08-31)
+
+
+### Bug Fixes
+
+* **cockpit-alerting:** opensearch load threshold ([3d534ec](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/3d534ec75afb7d9827b0b39dd72f6650b6b07f5d))
+
 ## [2.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.1.0...cockpit-alerting-v2.2.0) (2026-08-27)
 
 
