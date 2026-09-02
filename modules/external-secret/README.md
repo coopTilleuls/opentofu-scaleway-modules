@@ -17,15 +17,42 @@ ce module ne l'installe pas, il configure uniquement les objets applicatifs qui 
 ## Exemple
 
 ```hcl
-module "external_secret" {
+module "external_secret_loki" {
   source = "git::https://<repo-url>//modules/external-secret?ref=external-secret-vX.Y.Z"
 
-  name       = "secret-manager-${terraform.workspace}"
+  name       = "loki"
   project_id = var.project_id
-  namespaces = toset(keys(var.namespaces))
+  namespaces = [
+    "infra-loki",
+  ]
+  allowed_secrets = [
+    "loki-${terraform.workspace}",
+  ]
+}
 
-  providers = {
-    kubernetes = kubernetes
+# then only add custom external secrets
+resource "kubernetes_manifest" "loki-external-secrets" {
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "loki-bucket"
+      namespace = "infra-loki"
+    }
+    spec = {
+      refreshInterval = "5m"
+      secretStoreRef = {
+        kind = "SecretStore"
+        name = "secretstore"
+      }
+      dataFrom = [
+        {
+          extract : {
+            key = "id:${split("/", local.loki_secret_key_id)[1]}"
+          }
+        }
+      ]
+    }
   }
 }
 ```

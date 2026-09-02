@@ -1,36 +1,50 @@
 # Compte IAM Scaleway dédié à la lecture du Secret Manager (ESO).
-resource "scaleway_iam_application" "secret_manager" {
-  name = var.name
+resource "scaleway_iam_application" "external_secret" {
+  name = "eso-${var.name}-${terraform.workspace}"
+}
+
+resource "scaleway_iam_api_key" "external_secret" {
+  application_id = scaleway_iam_application.external_secret.id
+  description    = "eso-${var.name}-${terraform.workspace}"
+}
+
+# secret contentant le compte
+resource "scaleway_secret" "external_secret" {
+  name        = "eso-${var.name}-${terraform.workspace}"
+  description = "api key pour external secret ${var.name} ${terraform.workspace}"
+  type        = "key_value"
+}
+
+resource "scaleway_secret_version" "external_secret_version" {
+  description = "Version 1"
+  secret_id   = scaleway_secret.external_secret.id
+  data        = jsonencode(
+    {
+      "access-key"        = scaleway_iam_api_key.external_secret.access_key
+      "secret-access-key" = scaleway_iam_api_key.external_secret.secret_key
+    }
+  )
+}
+
+data "scaleway_secret" "by_name" {
+  for_each = var.allowed_secrets
+  name = each.key
+}
+
+locals {
+  policy_condition = join("||", [for allowed_secret in data.scaleway_secret.by_name : "resource.id == \"${split("/",allowed_secret.secret_id)[1]}\"" ])
 }
 
 # Politique IAM donnant à cette application un accès en lecture seule au Secret Manager.
 resource "scaleway_iam_policy" "secret_read_only" {
-  name           = "${var.name}-policy"
+  name           = "eso-${var.name}-${terraform.workspace}"
   description    = "gives app readonly access to secret manager"
-  application_id = scaleway_iam_application.secret_manager.id
+  application_id = scaleway_iam_application.external_secret.id
   rule {
     project_ids          = [var.project_id]
     permission_set_names = ["SecretManagerReadOnly", "SecretManagerSecretAccess"]
+    condition = local.policy_condition
   }
-}
-
-# Un secret Scaleway Secret Manager par namespace applicatif, source de l'ExternalSecret.
-resource "scaleway_secret" "namespace" {
-  for_each = var.namespaces
-  name     = each.key
-  type     = "key_value"
-}
-
-# Référence le secret Scaleway contenant les credentials du compte de service Secret Manager,
-# créé manuellement au préalable dans la console Scaleway (cf `bootstrap_secret_name`).
-data "scaleway_secret" "secret_manager" {
-  name = var.bootstrap_secret_name
-}
-
-# Récupère la dernière révision des credentials, utilisée pour peupler le secret K8s bootstrap.
-data "scaleway_secret_version" "secret_manager" {
-  secret_id = data.scaleway_secret.secret_manager.id
-  revision  = "latest"
 }
 
 # Secret bootstrap nécessaire pour que le SecretStore puisse s'authentifier auprès du Secret
@@ -43,8 +57,8 @@ resource "kubernetes_secret_v1" "bootstrap" {
     namespace = each.key
   }
   data = {
-    access-key        = jsondecode(base64decode(data.scaleway_secret_version.secret_manager.data))["access-key"]
-    secret-access-key = jsondecode(base64decode(data.scaleway_secret_version.secret_manager.data))["secret-access-key"]
+    access-key        = jsondecode(base64decode(scaleway_secret_version.external_secret_version.data))["access-key"]
+    secret-access-key = jsondecode(base64decode(scaleway_secret_version.external_secret_version.data))["secret-access-key"]
   }
 }
 
@@ -84,36 +98,36 @@ resource "kubernetes_manifest" "secret_store" {
   }
 }
 
-# ExternalSecret : synchronise le secret Scaleway Secret Manager (clé = nom du namespace)
-# vers un Secret K8s dans chaque namespace.
-resource "kubernetes_manifest" "external_secret" {
-  for_each   = var.namespaces
-  depends_on = [kubernetes_manifest.secret_store]
-
-  manifest = {
-    apiVersion = "external-secrets.io/v1"
-    kind       = "ExternalSecret"
-    metadata = {
-      name      = var.external_secret_name
-      namespace = each.key
-    }
-    spec = {
-      refreshInterval = var.refresh_interval
-      secretStoreRef = {
-        kind = "SecretStore"
-        name = var.secret_store_name
-      }
-      target = {
-        name           = var.target_secret_name
-        creationPolicy = "Owner"
-      }
-      dataFrom = [
-        {
-          extract = {
-            key = "id:${split("/", scaleway_secret.namespace[each.key].id)[1]}"
-          }
-        }
-      ]
-    }
-  }
-}
+## ExternalSecret : synchronise le secret Scaleway Secret Manager (clé = nom du namespace)
+## vers un Secret K8s dans chaque namespace.
+#resource "kubernetes_manifest" "external_secret" {
+#  for_each   = var.namespaces
+#  depends_on = [kubernetes_manifest.secret_store]
+#
+#  manifest = {
+#    apiVersion = "external-secrets.io/v1"
+#    kind       = "ExternalSecret"
+#    metadata = {
+#      name      = var.external_secret_name
+#      namespace = each.key
+#    }
+#    spec = {
+#      refreshInterval = var.refresh_interval
+#      secretStoreRef = {
+#        kind = "SecretStore"
+#        name = var.secret_store_name
+#      }
+#      target = {
+#        name           = var.target_secret_name
+#        creationPolicy = "Owner"
+#      }
+#      dataFrom = [
+#        {
+#          extract = {
+#            key = "id:${split("/", scaleway_secret.namespace[each.key].id)[1]}"
+#          }
+#        }
+#      ]
+#    }
+#  }
+#}

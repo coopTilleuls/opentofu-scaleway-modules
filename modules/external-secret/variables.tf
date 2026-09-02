@@ -23,6 +23,13 @@ variable "namespaces" {
   type        = set(string)
 }
 
+variable "allowed_secrets" {
+  description = <<-EOT
+    Liste des scaleway_secrets sur lesquels autoriser les accès
+  EOT
+  type        = set(string)
+}
+
 variable "bootstrap_secret_name" {
   description = <<-EOT
     Nom du secret Secret Manager contenant les credentials (`access-key`/`secret-access-key`) du
@@ -32,7 +39,7 @@ variable "bootstrap_secret_name" {
     pas, il le lit et le recopie en secret Kubernetes dans chaque namespace.
   EOT
   type        = string
-  default     = "scwsm-secret"
+  default     = "external-secret-credentials"
 }
 
 variable "secret_store_name" {
