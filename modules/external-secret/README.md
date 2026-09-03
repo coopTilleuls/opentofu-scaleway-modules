@@ -25,8 +25,8 @@ module "external_secret_loki" {
   namespaces = [
     "infra-loki",
   ]
-  allowed_secrets = [
-    "loki-${terraform.workspace}",
+  allowed_secrets_ids = [
+    scaleway_secret.loki.id
   ]
 }
 
@@ -43,7 +43,7 @@ resource "kubernetes_manifest" "loki-external-secrets" {
       refreshInterval = "5m"
       secretStoreRef = {
         kind = "SecretStore"
-        name = "secretstore"
+        name = module.external_secret_loki.secretstore
       }
       dataFrom = [
         {

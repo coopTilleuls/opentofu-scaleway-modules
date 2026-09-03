@@ -26,13 +26,11 @@ resource "scaleway_secret_version" "external_secret_version" {
   )
 }
 
-data "scaleway_secret" "by_name" {
-  for_each = var.allowed_secrets
-  name = each.key
-}
-
 locals {
-  policy_condition = join("||", [for allowed_secret in data.scaleway_secret.by_name : "resource.id == \"${split("/",allowed_secret.secret_id)[1]}\"" ])
+  policy_condition = join("||", [for allowed_secret_id in var.allowed_secrets_ids : "resource.id == \"${split("/",allowed_secret_id)[1]}\"" ])
+  # https://www.scaleway.com/en/docs/iam/reference-content/understanding-resource-level-conditions/#resource-level-conditions-and-listing-actions
+  policy_list_condition = "(${local.policy_condition}) || !has(resource.id)"
+  secret_store_name = "secretstore-${var.name}"
 }
 
 # Politique IAM donnant à cette application un accès en lecture seule au Secret Manager.
@@ -43,17 +41,18 @@ resource "scaleway_iam_policy" "secret_read_only" {
   rule {
     project_ids          = [var.project_id]
     permission_set_names = ["SecretManagerReadOnly", "SecretManagerSecretAccess"]
-    condition = local.policy_condition
+    #condition = local.policy_condition
+    condition = local.policy_list_condition
   }
 }
 
 # Secret bootstrap nécessaire pour que le SecretStore puisse s'authentifier auprès du Secret
 # Manager Scaleway. Contrairement à AWS/IRSA, Scaleway ne supporte pas l'authentification sans
 # credentials explicites. Sans ce secret, le SecretStore reste en erreur "InvalidProviderConfig".
-resource "kubernetes_secret_v1" "bootstrap" {
+resource "kubernetes_secret_v1" "external_secret_credentials" {
   for_each = var.namespaces
   metadata {
-    name      = var.bootstrap_secret_name
+    name      = local.secret_store_name
     namespace = each.key
   }
   data = {
@@ -66,13 +65,13 @@ resource "kubernetes_secret_v1" "bootstrap" {
 # depends_on garantit que le secret existe avant la création du SecretStore.
 resource "kubernetes_manifest" "secret_store" {
   for_each   = var.namespaces
-  depends_on = [kubernetes_secret_v1.bootstrap]
+  depends_on = [kubernetes_secret_v1.external_secret_credentials]
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "SecretStore"
     metadata = {
       annotations = {}
-      name        = var.secret_store_name
+      name        = "secretstore-${var.name}"
       namespace   = each.key
     }
     spec = {
@@ -81,7 +80,7 @@ resource "kubernetes_manifest" "secret_store" {
           accessKey = {
             secretRef = {
               key  = "access-key"
-              name = var.bootstrap_secret_name
+		name = local.secret_store_name
             }
           }
           projectId = var.project_id
@@ -89,7 +88,7 @@ resource "kubernetes_manifest" "secret_store" {
           secretKey = {
             secretRef = {
               key  = "secret-access-key"
-              name = var.bootstrap_secret_name
+              name = local.secret_store_name
             }
           }
         }
@@ -97,37 +96,3 @@ resource "kubernetes_manifest" "secret_store" {
     }
   }
 }
-
-## ExternalSecret : synchronise le secret Scaleway Secret Manager (clé = nom du namespace)
-## vers un Secret K8s dans chaque namespace.
-#resource "kubernetes_manifest" "external_secret" {
-#  for_each   = var.namespaces
-#  depends_on = [kubernetes_manifest.secret_store]
-#
-#  manifest = {
-#    apiVersion = "external-secrets.io/v1"
-#    kind       = "ExternalSecret"
-#    metadata = {
-#      name      = var.external_secret_name
-#      namespace = each.key
-#    }
-#    spec = {
-#      refreshInterval = var.refresh_interval
-#      secretStoreRef = {
-#        kind = "SecretStore"
-#        name = var.secret_store_name
-#      }
-#      target = {
-#        name           = var.target_secret_name
-#        creationPolicy = "Owner"
-#      }
-#      dataFrom = [
-#        {
-#          extract = {
-#            key = "id:${split("/", scaleway_secret.namespace[each.key].id)[1]}"
-#          }
-#        }
-#      ]
-#    }
-#  }
-#}
