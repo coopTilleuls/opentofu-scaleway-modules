@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/external-secret-v1.1.0...external-secret-v1.2.0) (2026-09-03)
+
+
+### Features
+
+* **external-secret:** by secret id ([7619400](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/76194002004fd4fdf86839bbc52f43161e466f6c))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/external-secret-v1.0.0...external-secret-v1.1.0) (2026-09-02)
 
 
