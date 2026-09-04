@@ -1,4 +1,16 @@
 resource "random_password" "admin" {
+  lifecycle {
+    # do not replace imported shortests passwords
+    ignore_changes = [
+      length,
+      min_lower,
+      min_numeric,
+      min_special,
+      min_upper,
+      override_special
+    ]
+  }
+
   # Généré seulement si l'appelant ne fournit pas son propre mot de passe. Contraintes de
   # complexité alignées sur les exigences Scaleway (au moins 1 majuscule/minuscule/chiffre/
   # caractère spécial) pour éviter un rejet aléatoire de l'API selon le tirage.
@@ -66,10 +78,22 @@ resource "scaleway_rdb_database" "this" {
   for_each = toset(var.databases)
 
   instance_id = scaleway_rdb_instance.this.id
-  name        = each.key
+  name        = "${each.key}_${terraform.workspace}"
 }
 
 resource "random_password" "user" {
+  lifecycle {
+    # do not replace imported shortests passwords
+    ignore_changes = [
+      length,
+      min_lower,
+      min_numeric,
+      min_special,
+      min_upper,
+      override_special
+    ]
+  }
+
   # Un mot de passe dédié par base, uniquement si des utilisateurs dédiés sont demandés.
   for_each = var.create_dedicated_users ? toset(var.databases) : []
 
@@ -86,7 +110,7 @@ resource "scaleway_rdb_user" "this" {
   for_each = var.create_dedicated_users ? toset(var.databases) : []
 
   instance_id = scaleway_rdb_instance.this.id
-  name        = each.key
+  name        = "${each.key}_${terraform.workspace}"
   password    = random_password.user[each.key].result
   is_admin    = false
 }
