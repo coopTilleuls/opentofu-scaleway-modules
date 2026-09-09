@@ -125,3 +125,11 @@ variable "create_dedicated_users" {
   type        = bool
   default     = true
 }
+
+variable "create_readonly_users" {
+  description = <<-EOT
+    créé pour chaque base un deuxième user avec les droits readonly
+  EOT
+  type        = bool
+  default     = false
+}

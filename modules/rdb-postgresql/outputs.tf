@@ -8,6 +8,10 @@ output "private_ip" {
   value       = scaleway_rdb_instance.this.private_network[0].ip
 }
 
+output "private_network_id" {
+  value       = var.private_network_id
+}
+
 output "admin_user_name" {
   description = "Nom de l'utilisateur administrateur."
   value       = var.admin_user_name
@@ -32,6 +36,19 @@ output "database_users" {
     for db_name, user in scaleway_rdb_user.this : db_name => {
       username = user.name
       password = random_password.user[db_name].result
+    }
+  }
+  sensitive = true
+}
+
+output "database_users_ro" {
+  description = <<-EOT
+    Map nom_de_base => { username, password }, uniquement renseignée si `create_readonly_users = true`.
+  EOT
+  value = {
+    for db_name, user in scaleway_rdb_user.this_ro : db_name => {
+      username = user.name
+      password = random_password.user_ro[db_name].result
     }
   }
   sensitive = true

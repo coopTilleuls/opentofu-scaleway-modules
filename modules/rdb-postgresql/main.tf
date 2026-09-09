@@ -106,6 +106,31 @@ resource "random_password" "user" {
   min_special      = 1
 }
 
+resource "random_password" "user_ro" {
+  lifecycle {
+    # do not replace imported shortests passwords
+    ignore_changes = [
+      length,
+      min_lower,
+      min_numeric,
+      min_special,
+      min_upper,
+      override_special
+    ]
+  }
+
+  # Un mot de passe dédié par base, uniquement si des utilisateurs dédiés sont demandés.
+  for_each = var.create_dedicated_users ? toset(var.databases) : []
+
+  length           = 32
+  special          = true
+  override_special = "_"
+  min_upper        = 1
+  min_lower        = 1
+  min_numeric      = 1
+  min_special      = 1
+}
+
 resource "scaleway_rdb_user" "this" {
   for_each = var.create_dedicated_users ? toset(var.databases) : []
 
@@ -115,8 +140,17 @@ resource "scaleway_rdb_user" "this" {
   is_admin    = false
 }
 
+resource "scaleway_rdb_user" "this_ro" {
+  for_each = var.create_dedicated_users && var.create_readonly_users ? toset(var.databases) : []
+
+  instance_id = scaleway_rdb_instance.this.id
+  name        = "${each.key}_readonly_${terraform.workspace}"
+  password    = random_password.user_ro[each.key].result
+  is_admin    = false
+}
+
 resource "scaleway_rdb_privilege" "this" {
-  for_each = var.create_dedicated_users ? toset(var.databases) : []
+  for_each = var.create_dedicated_users && var.create_readonly_users ? toset(var.databases) : []
 
   # Contrairement à scaleway_rdb_database/scaleway_rdb_user, le provider Scaleway ne déduit pas la
   # région de scaleway_rdb_privilege depuis le préfixe régional d'instance_id : sans `region`
@@ -127,4 +161,18 @@ resource "scaleway_rdb_privilege" "this" {
   user_name     = scaleway_rdb_user.this[each.key].name
   database_name = scaleway_rdb_database.this[each.key].name
   permission    = "all"
+}
+
+resource "scaleway_rdb_privilege" "this_ro" {
+  for_each = var.create_dedicated_users && var.create_readonly_users ? toset(var.databases) : []
+
+  # Contrairement à scaleway_rdb_database/scaleway_rdb_user, le provider Scaleway ne déduit pas la
+  # région de scaleway_rdb_privilege depuis le préfixe régional d'instance_id : sans `region`
+  # explicite, la ressource retombe sur la région par défaut du provider et échoue dès que
+  # `var.region` en diffère (l'UUID d'instance n'existe pas dans cette région-là).
+  region        = var.region
+  instance_id   = scaleway_rdb_instance.this.id
+  user_name     = scaleway_rdb_user.this_ro[each.key].name
+  database_name = scaleway_rdb_database.this[each.key].name
+  permission    = "readonly"
 }
