@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.1.0...rdb-postgresql-v1.2.0) (2026-09-09)
+
+
+### Features
+
+* **rdb-postgresql:** create readonly users ([219156d](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/219156d5e82f78bd8997ad4cd248f5353615d9e5))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.0.0...rdb-postgresql-v1.1.0) (2026-09-04)
 
 
