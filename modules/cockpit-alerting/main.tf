@@ -603,8 +603,8 @@ locals {
           name = "Memory"
           threshold = {
             # en %
-            warning  = 80
-            critical = 90
+            warning  = 90
+            critical = 95
           }
           duration = {
             warning  = "10m"
