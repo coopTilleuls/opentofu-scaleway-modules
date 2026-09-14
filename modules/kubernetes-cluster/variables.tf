@@ -61,6 +61,7 @@ variable "autoscaler_config" {
     scale_down_utilization_threshold = optional(number, 0.9)
     skip_nodes_with_local_storage    = optional(bool, false)
     log_level                        = optional(number, 2)
+    max_graceful_termination_sec     = optional(number, 600)
   })
   default = {}
 }

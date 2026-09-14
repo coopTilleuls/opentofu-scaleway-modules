@@ -29,6 +29,7 @@ resource "scaleway_k8s_cluster" "this" {
     scale_down_utilization_threshold = var.autoscaler_config.scale_down_utilization_threshold
     skip_nodes_with_local_storage    = var.autoscaler_config.skip_nodes_with_local_storage
     log_level                        = var.autoscaler_config.log_level
+    max_graceful_termination_sec     = var.autoscaler_config.max_graceful_termination_sec
   }
 
   dynamic "auto_upgrade" {
