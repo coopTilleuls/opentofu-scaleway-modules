@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v5.1.0...kubernetes-cluster-v5.1.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* **kubernetes-cluster:** allow max_graceful_termination_sec cluster autoscaler option ([cdd867e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/cdd867e458194610e797c51a0ba13e3c1fdd5010))
+
 ## [5.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v5.0.0...kubernetes-cluster-v5.1.0) (2026-08-24)
 
 
