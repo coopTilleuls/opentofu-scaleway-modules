@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.1.0...object-bucket-v1.2.0) (2026-09-15)
+
+
+### Features
+
+* **kubernetes-cluster:** autoscaler config ([23fa44e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/23fa44e2009964fef8aa5cfa4532cf75e9174ed0))
+* **kubernetes-cluster:** empty commit ([b9de0ae](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b9de0aefa29669e7c517e5f3fe40bcbe8a32cae5))
+* **object-bucket:** rewrite readwrite/readonly/app inputs ([384c424](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/384c4247c728850c392386e6d92f9ed2a9db0c27))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/object-bucket-v1.0.3...object-bucket-v1.1.0) (2026-07-28)
 
 
