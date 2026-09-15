@@ -51,55 +51,59 @@ variable "lifecycle_rules" {
   default = []
 }
 
-variable "sre_group_id" {
+variable "readwrite_group_ids" {
   description = <<-EOT
-    ID du groupe IAM SRE auquel accorder un accès complet au bucket (statement "sre secure
-    statement" des repos d'origine). Laisser à null pour ne pas ajouter ce statement.
+    ID des groupe IAM auxquels accorder un accès complet au bucket
   EOT
-  type        = string
-  default     = null
+  type        = list(string)
+  default     = []
 }
 
-variable "enable_sre_access" {
-  description = <<-EOT
-    Force explicitement la présence (`true`) ou l'absence (`false`) du statement SRE, indépendamment
-    de la valeur de `sre_group_id`. Laisser à null (défaut) pour déduire automatiquement de
-    `sre_group_id != null` — ce qui échoue avec "Invalid count argument" si `sre_group_id` provient
-    d'une ressource créée dans ce même apply (sa valeur n'est alors pas encore connue au plan).
-    Passer `true` explicitement dans ce cas.
-  EOT
-  type        = bool
-  default     = null
-}
-
-variable "sre_actions" {
-  description = "Actions S3 accordées au groupe SRE."
+variable "readwrite_actions" {
+  description = "Actions S3 accordées aux groupes de readwrite_group_ids"
   type        = list(string)
   default     = ["s3:*"]
 }
 
-variable "app_application_id" {
+variable "readonly_group_ids" {
   description = <<-EOT
-    ID de l'application IAM (ex: produite par le module `iam-app-identity`) à qui accorder un
-    accès scopé au bucket. Laisser à null pour ne pas ajouter ce statement.
+    ID des groupe IAM auxquels accorder un accès complet au bucket
   EOT
-  type        = string
-  default     = null
+  type        = list(string)
+  default     = []
 }
 
-variable "enable_app_access" {
+variable "readonly_actions" {
+  description = "Actions S3 accordées aux groupes de readonly_group_ids"
+  type        = list(string)
+  default     = [
+    "s3:GetBucketAcl",
+    "s3:GetBucketCORS",
+    "s3:GetBucketLocation",
+    "s3:GetBucketObjectLockConfiguration",
+    "s3:GetBucketTagging",
+    "s3:GetBucketVersioning",
+    "s3:GetBucketWebsite",
+    "s3:GetEncryptionConfiguration",
+    "s3:GetLifecycleConfiguration",
+    "s3:ListBucket",
+    "s3:ListBucketMultipartUploads",
+    "s3:ListBucketVersions",
+  ]
+}
+
+
+variable "application_ids" {
   description = <<-EOT
-    Équivalent de `enable_sre_access` pour `app_application_id`. À passer explicitement à `true`
-    quand `app_application_id` référence une application IAM créée dans le même apply (cas le plus
-    courant : ce module est presque toujours associé à `iam-app-identity` dans le même apply, voir
-    l'exemple du README).
+    IDs des application IAM (ex: produite par le module `iam-app-identity`) à qui accorder un
+    accès scopé au bucket. Laisser à null pour ne pas ajouter ce statement.
   EOT
-  type        = bool
-  default     = null
+  type        = list(string)
+  default     = []
 }
 
 variable "app_actions" {
-  description = "Actions S3 accordées à l'application."
+  description = "Actions S3 accordées aux applications de application_ids"
   type        = list(string)
   default     = ["s3:*"]
 }

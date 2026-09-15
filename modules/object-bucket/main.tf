@@ -86,22 +86,16 @@ locals {
   bucket = one(concat(scaleway_object_bucket.this, scaleway_object_bucket.protected))
 }
 
-locals {
-  # var.xxx_id == null serait "unknown" (donc invalide dans un count/for_each) si xxx_id provient
-  # d'une ressource créée dans le même apply (ex: application IAM produite par le module
-  # `iam-app-identity` juste au-dessus) : sa valeur n'est pas encore connue au moment du plan, mais
-  # Terraform/OpenTofu ne peut pas non plus garantir statiquement qu'elle ne sera pas `null`. Les
-  # variables enable_sre_access/enable_app_access permettent à l'appelant de trancher explicitement
-  # (littéral, donc toujours connu) plutôt que de laisser ce module le déduire de la valeur de l'ID.
-  sre_enabled = var.enable_sre_access != null ? var.enable_sre_access : var.sre_group_id != null
-  app_enabled = var.enable_app_access != null ? var.enable_app_access : var.app_application_id != null
+data "scaleway_iam_group" "readwrite" {
+  for_each = toset(var.readwrite_group_ids)
+  group_id = each.key
 }
 
-data "scaleway_iam_group" "sre" {
-  count = local.sre_enabled ? 1 : 0
-
-  group_id = var.sre_group_id
+data "scaleway_iam_group" "readonly" {
+  for_each = toset(var.readonly_group_ids)
+  group_id = each.key
 }
+
 
 locals {
   # Statement "accès total" pour le groupe SRE : présent dans tous les buckets applicatifs des
@@ -109,8 +103,8 @@ locals {
   # sources résolvent systématiquement le groupe en la liste des `user_id:` de ses membres (jamais
   # `group_id:<id>`, jamais éprouvé en production d'après leurs propres commentaires : "pas de
   # groupe pour l'instant, il faudra surveiller les news").
-  sre_statement = local.sre_enabled ? [{
-    Sid    = "SreFullAccess"
+  readwrite_group_statement = length(var.readwrite_group_ids) > 0 ? [{
+    Sid    = "ReadWriteUserAccess"
     Effect = "Allow"
     Principal = {
       # tolist() : sans ça, ce for-expression produit un tuple de taille fixe (arité = nombre de
@@ -118,22 +112,37 @@ locals {
       # de deux objets dont un attribut a des tuples de tailles différentes fait planter OpenTofu
       # dès que l'une des deux valeurs est encore inconnue au plan (ex: application_id d'une
       # ressource créée dans le même apply) — cf panic "Error in function call" sur concat(seqs...).
-      SCW = tolist([for user_id in data.scaleway_iam_group.sre[0].user_ids : "user_id:${user_id}"])
+      # pas encore possible via group: https://feature-request.scaleway.com/posts/714/bucket-policy-with-group_id
+      SCW = tolist(distinct(flatten([for group_id in var.readwrite_group_ids : [for user_id in data.scaleway_iam_group.readwrite[group_id].user_ids : "user_id:${user_id}"]])))
     }
-    Action = var.sre_actions
+    Action = var.readwrite_actions
     Resource = [
       local.bucket.name,
       "${local.bucket.name}/*",
     ]
   }] : []
 
-  app_statement = local.app_enabled ? [{
+  readonly_group_statement = length(var.readonly_group_ids) > 0 ? [{
+    Sid    = "ReadOnlyUserAccess"
+    Effect = "Allow"
+    Principal = {
+      SCW = tolist(distinct(flatten([for group_id in var.readonly_group_ids : [for user_id in data.scaleway_iam_group.readonly[group_id].user_ids : "user_id:${user_id}"]])))
+    }
+    Action = var.readonly_actions
+    Resource = [
+      local.bucket.name,
+      "${local.bucket.name}/*",
+    ]
+  }] : []
+
+  app_statement = length(var.application_ids) > 0 ? [{
     Sid    = "ApplicationScopedAccess"
     Effect = "Allow"
     Principal = {
-      # tolist() : voir le commentaire équivalent sur sre_statement.SCW (même type cty list(string)
+      # tolist() : voir le commentaire équivalent sur readwrite_statement.SCW (même type cty list(string)
       # des deux côtés, indépendamment du nombre d'éléments).
-      SCW = tolist(["application_id:${var.app_application_id}"])
+      #SCW = tolist(["application_id:${var.app_application_id}"])
+      SCW = tolist([for application_id in var.application_ids : "application_id:${application_id}"])
     }
     Action = var.app_actions
     Resource = [
@@ -142,7 +151,12 @@ locals {
     ]
   }] : []
 
-  policy_statements = concat(local.sre_statement, local.app_statement, var.additional_policy_statements)
+  policy_statements = concat(
+    local.readwrite_group_statement,
+    local.readonly_group_statement,
+    local.app_statement,
+    var.additional_policy_statements
+  )
 }
 
 resource "scaleway_object_bucket_policy" "this" {

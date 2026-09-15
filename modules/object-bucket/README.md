@@ -34,11 +34,15 @@ module "velero_bucket" {
     }
   ]
 
-  sre_group_id        = data.scaleway_iam_group.sre.id
-  app_application_id  = module.velero_identity.application_id
-  # module.velero_identity est créé dans ce même apply : sa valeur n'est pas encore connue au
-  # plan, donc à passer explicitement plutôt que de laisser ce module la déduire (voir remarque).
-  enable_app_access   = true
+  readwrite_group_ids = [
+    data.scaleway_iam_group.leaddev.id
+  ]
+  readonly_group_ids = [
+    data.scaleway_iam_group.dev.id
+  ]
+  application_ids = [
+    module.velero_identity.application_id
+  ]
 }
 ```
 
