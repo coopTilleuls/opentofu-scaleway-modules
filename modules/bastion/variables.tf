@@ -31,6 +31,12 @@ variable "private_network_id" {
   type        = string
 }
 
+variable "allowed_cidrs" {
+  description = "List of allowed CIDRs. drop all by default"
+  type = list(string)
+  default = []
+}
+
 variable "root_volume_size_gb" {
   description = "Taille (en Go) du volume racine du bastion. Laisser à null pour utiliser la taille par défaut de l'offre Scaleway."
   type        = number

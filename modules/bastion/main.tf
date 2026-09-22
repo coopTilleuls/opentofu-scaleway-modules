@@ -1,3 +1,18 @@
+resource "scaleway_instance_security_group" "this" {
+  inbound_default_policy  = "drop"
+  outbound_default_policy = "accept"
+
+  dynamic "inbound_rule" {
+    for_each = var.allowed_cidrs
+
+    content {
+      action   = "accept"
+      port     = 22
+      ip_range = inbound_rule.value
+    }
+  }
+}
+
 resource "scaleway_instance_ip" "this" {
   # L'IP publique du bastion est un point d'entrée connu (whitelisté côté firewall, référencé en
   # DNS...) : elle ne doit pas pouvoir être supprimée par un `tofu apply`/`destroy` accidentel.
@@ -30,6 +45,7 @@ resource "scaleway_instance_server" "this" {
   project_id = var.project_id
   zone       = var.zone
   tags       = var.tags
+  security_group_id = scaleway_instance_security_group.this.id
 
   dynamic "root_volume" {
     for_each = var.root_volume_size_gb != null ? [var.root_volume_size_gb] : []
