@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.2.0...rdb-postgresql-v1.3.0) (2026-09-23)
+
+
+### Features
+
+* **rdb-postgresql:** compute default settings ([7505f9f](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/7505f9f4e673653cb7532c3e2708ffd0793eee3f))
+
 ## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.1.0...rdb-postgresql-v1.2.0) (2026-09-09)
 
 
