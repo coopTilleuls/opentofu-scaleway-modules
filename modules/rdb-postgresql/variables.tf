@@ -22,9 +22,14 @@ variable "engine_version" {
 }
 
 variable "node_type" {
-  description = "Type de nœud de l'instance (ex: \"db-dev-m\")."
+  description = "Type de nœud de l'instance (ex: \"DB-DEV-M\")."
   type        = string
-  default     = "db-dev-m"
+  default     = "DB-DEV-M"
+
+  validation {
+    condition     = can(regex("^[A-Z0-9-]+$", var.node_type))
+    error_message = "node_type must be in uppercase"
+  }
 }
 
 variable "is_ha_cluster" {

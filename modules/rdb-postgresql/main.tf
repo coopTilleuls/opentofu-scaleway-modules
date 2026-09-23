@@ -31,6 +31,61 @@ resource "random_password" "admin" {
 
 locals {
   admin_password = var.admin_password != null ? var.admin_password : random_password.admin[0].result
+
+  node_type_cpu = {
+    "DB-DEV-S" = 2
+    "DB-DEV-M" = 3
+    "DB-DEV-L" = 4
+    "DB-DEV-XL" = 4
+    # ...
+    "DB-POP2-2C-8G" = 2
+    "DB-POP2-4C-16G" = 4
+    "DB-POP2-8C-32G" = 8
+    "DB-POP2-16C-64G" = 16
+    "DB-POP2-32C-128G" = 32
+  }
+  node_type_mem = {
+    "DB-DEV-S" = 2
+    "DB-DEV-M" = 4
+    "DB-DEV-L" = 8
+    "DB-DEV-XL" = 12
+    # ...
+    "DB-POP2-2C-8G" = 8
+    "DB-POP2-4C-16G" = 16
+    "DB-POP2-8C-32G" = 32
+    "DB-POP2-16C-64G" = 64
+    "DB-POP2-32C-128G" = 128
+  }
+  volume_type_cost = {
+    lssd = 1.1 # local = local latency only
+    sbs_5k = 1.5
+    sbs_15k = 1.2
+  }
+
+  # Some settings are dependent of the instance size and/or storage type
+  computed_settings = {
+
+    # effective_cache_size : 50% of memory if nothing specified (hot reload)
+    effective_cache_size = lookup(local.node_type_mem,var.node_type)*1024/2
+
+    # max_parallel_workers : number of cpu (hot reload)
+    max_parallel_workers = lookup(local.node_type_cpu,var.node_type)
+
+    # max_parallel_workers_per_gather : 1/4 of cpu count (hot reload)
+    max_parallel_workers_per_gather = max(lookup(local.node_type_cpu,var.node_type)/4,2)
+
+    # max_connections : depends of available memory (NEEDS RESTART)
+    max_connections = min(lookup(local.node_type_mem,var.node_type)*1024/8,2000)
+
+    # random_page_cost and seq_page_cost depends of the volume type (hot reload)
+    random_page_cost = lookup(local.volume_type_cost,var.volume_type)
+    seq_page_cost = lookup(local.volume_type_cost,var.volume_type)
+
+  }
+
+  # we merge computed settings with user settings
+  # when set, user settings takes precedence
+  merged_settings = merge(local.computed_settings, var.settings)
 }
 
 resource "scaleway_rdb_instance" "this" {
@@ -61,10 +116,7 @@ resource "scaleway_rdb_instance" "this" {
   volume_size_in_gb  = var.volume_type == "lssd" ? null : var.volume_size_in_gb
   encryption_at_rest = var.encryption_at_rest
 
-  # `null` (et non une map vide) quand l'appelant ne fournit rien : `settings` est un attribut
-  # optional+computed côté provider, une map vide explicite écraserait à chaque apply les réglages
-  # déjà présents sur l'instance (ex: ceux fixés par défaut par Scaleway).
-  settings = length(var.settings) > 0 ? var.settings : null
+  settings = local.merged_settings
 
   tags = var.tags
 
