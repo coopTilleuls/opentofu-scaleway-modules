@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.3.0...rdb-postgresql-v1.4.0) (2026-09-28)
+
+
+### Features
+
+* **rdb-postgresql:** add log policy ([c16d474](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/c16d4740d0e925f8d61b0ebe41bf68badc1bd24e))
+
 ## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.2.0...rdb-postgresql-v1.3.0) (2026-09-23)
 
 
