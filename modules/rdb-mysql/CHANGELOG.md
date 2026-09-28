@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-mysql-v1.1.0...rdb-mysql-v1.2.0) (2026-09-28)
+
+
+### Features
+
+* **rdb-mysql:** allow configure log policy ([9592bf4](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/9592bf4e44ac9084e8cde82899375a02c8fc7ea9))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-mysql-v1.0.0...rdb-mysql-v1.1.0) (2026-09-01)
 
 
