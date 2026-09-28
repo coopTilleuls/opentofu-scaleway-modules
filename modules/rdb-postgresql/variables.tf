@@ -69,6 +69,18 @@ variable "encryption_at_rest" {
   default     = true
 }
 
+variable "logs_policy_max_age_retention" {
+  description = "Max age in days of log files"
+  type        = number
+  default     = 3
+}
+
+variable "logs_policy_total_disk_retention" {
+  description = "Max size in bytes on logs files"
+  type        = number
+  default     = 3*1024*1024*1024
+}
+
 variable "disable_backup" {
   description = "Désactive les sauvegardes automatiques."
   type        = bool

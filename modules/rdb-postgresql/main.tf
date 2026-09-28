@@ -124,6 +124,12 @@ resource "scaleway_rdb_instance" "this" {
     pn_id       = var.private_network_id
     enable_ipam = true
   }
+
+  # Cf https://github.com/scaleway/terraform-provider-scaleway/issues/4378 and https://github.com/scaleway/terraform-provider-scaleway/pull/4400
+  logs_policy {
+    max_age_retention    = var.logs_policy_max_age_retention
+    total_disk_retention = var.logs_policy_total_disk_retention
+  }
 }
 
 resource "scaleway_rdb_database" "this" {
