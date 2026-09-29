@@ -13,6 +13,11 @@ output "public_gateway_ids" {
   value       = { for key, gw in scaleway_vpc_public_gateway.this : key => gw.id }
 }
 
+output "public_gateway_names" {
+  description = "Map \"clé_gateway/zone\" => nom Scaleway de la public gateway (label `resource_name` des métriques Cockpit, cf. module `cockpit-alerting-custom-rules`)."
+  value       = { for key, gw in scaleway_vpc_public_gateway.this : key => gw.name }
+}
+
 output "public_gateway_ips" {
   description = "Map \"clé_gateway/zone\" => adresse IP flexible publique de la gateway."
   value       = { for key, ip in scaleway_vpc_public_gateway_ip.gateway : key => ip.address }
