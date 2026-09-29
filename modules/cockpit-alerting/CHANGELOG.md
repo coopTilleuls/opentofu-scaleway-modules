@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.2.2...cockpit-alerting-v3.0.0) (2026-09-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cockpit-alerting:** hardcoded additionnal_rules_groups and the public_gateway_size variable are removed. Instantiate cockpit-alerting-custom-rules for each resource to keep these alerts. See the migration section in the module README.
+
+### Features
+
+* **cockpit-alerting:** move additional rules to cockpit-alerting-custom-rules, add 5/7 routing ([98fdf17](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/98fdf17cd99aa9221488e179fafe8d208501d766))
+
 ## [2.2.2](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.2.1...cockpit-alerting-v2.2.2) (2026-09-09)
 
 
