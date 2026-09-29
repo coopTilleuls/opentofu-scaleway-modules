@@ -98,7 +98,24 @@ variable "custom_rules_groups" {
   default     = []
 }
 
-variable "public_gateway_size" {
-  description = "Public gateway size (S/M/L/XL). used to monitor public gateway bandwidth usage until a metric gives the capacity"
-  type        = string
+variable "business_hours" {
+  description = <<-EOT
+    Heures ouvrées (du lundi au vendredi) pendant lesquelles les alertes critical des ressources en
+    `service_level = "5/7"` (cf. module `cockpit-alerting-custom-rules`) partent vers
+    `webhook_url_critical`. En dehors, elles partent vers `webhook_url_warning`. Les jours fériés ne
+    sont pas gérés. `location` est un nom de fuseau IANA : le provider mimir ignore silencieusement
+    une valeur invalide (UTC utilisé à la place).
+  EOT
+  type = object({
+    start_time = optional(string, "09:00")
+    end_time   = optional(string, "18:00")
+    location   = optional(string, "Europe/Paris")
+  })
+  default  = {}
+  nullable = false
+
+  validation {
+    condition     = can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.business_hours.start_time)) && can(regex("^([01][0-9]|2[0-4]):[0-5][0-9]$", var.business_hours.end_time))
+    error_message = "business_hours.start_time et end_time doivent être au format HH:MM."
+  }
 }

@@ -57,23 +57,41 @@ module "cockpit_alerting" {
   logs_name    = "logs-source"
   traces_name  = "traces-source"
 
+  # optionnel, valeurs par défaut ci-dessous : heures ouvrées pour service_level = "5/7"
+  business_hours = {
+    start_time = "09:00"
+    end_time   = "18:00"
+    location   = "Europe/Paris"
+  }
+
+  # optionnel : règles vraiment spécifiques au projet. Pour les règles standard par type de
+  # ressource (PostgreSQL, public gateway, ETCD...), utiliser cockpit-alerting-custom-rules.
   custom_rules_groups = [
     {
-      name = "Custom - PostgreSQL"
+      name = "Custom - MyApp"
       rules = [
         {
-          name        = "Memory"
-          threshold   = { warning = 80, critical = 90 }
-          duration    = { warning = "10m", critical = "20m" }
-          expression  = "100 - ((rdb_instance_postgresql_node_memory_MemAvailable_bytes{} * 100) / rdb_instance_postgresql_node_memory_MemTotal_bytes{})"
+          name        = "Queue backlog"
+          threshold   = { warning = 1000, critical = 5000 }
+          duration    = { warning = "10m", critical = "10m" }
+          expression  = "sum(myapp_queue_messages)"
           comparaison = ">"
-          annotations = { summary = "High Memory usage on RDB PostgreSQL™ {{ $labels.resource_name }} cluster." }
-          description = "PostgreSQL™ {{ $labels.instance }} node on instance {{ $labels.resource_name }} - {{ $labels.resource_id }} has a memory usage superior to THRESHOLD% since DURATION"
-          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomPostgreSQL/Memory"
+          annotations = { summary = "MyApp queue backlog is high." }
+          description = "MyApp queue backlog is superior to THRESHOLD since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/..."
         },
       ]
     }
   ]
+}
+
+# Une instance par ressource à surveiller, cf. modules/cockpit-alerting-custom-rules
+module "alerting_rules_db_app" {
+  source = "git::https://<repo-url>//modules/cockpit-alerting-custom-rules?ref=cockpit-alerting-custom-rules-vX.Y.Z"
+
+  type          = "postgresql"
+  service_level = "5/7"
+  resource_name = "app-db"
 }
 
 # Le provider mimir référence une sortie de ce module (metrics_source_url) : voir Remarques
@@ -109,6 +127,14 @@ provider "mimir" {
   par alerte préconfigurée Scaleway) est figé dans ce module, pas exposé en
   variable : c'est la logique qu'on veut identique sur tous les projets.
   Seul `custom_rules_groups` varie par projet.
+- **Routage `service_level`** : les alertes `severity=critical` portant le
+  label `service_level="5/7"` (posé par
+  [`cockpit-alerting-custom-rules`](../cockpit-alerting-custom-rules)) ne
+  partent vers `webhook_url_critical` qu'aux heures ouvrées
+  (`business_hours`, lundi-vendredi, jours fériés non gérés), et vers
+  `webhook_url_warning` le reste du temps. Toute autre alerte critical
+  (`24/7`, alertes préconfigurées, `custom_rules_groups`) part toujours vers
+  `webhook_url_critical`.
 - **`webhook_url_critical`/`_warning`/`_info`** sont des variables
   obligatoires et sensibles (`sensitive = true`) : ce module ne fixe plus
   aucune URL de webhook en interne. À passer via `TF_VAR_...` ou un backend
@@ -116,3 +142,17 @@ provider "mimir" {
 - `custom_rules_groups` est typé en `list(any)` (pas de `object({...})`
   strict) vu la forme imbriquée et partiellement optionnelle de `rules` (cf.
   `variables.tf`).
+
+## Migration 2.x → 3.0.0
+
+- Les règles custom codées en dur (`additionnal_rules_groups` : ETCD, S2S VPN,
+  Public Gateway, PostgreSQL, OpenSearch) ne sont plus créées par ce module :
+  elles sont déplacées dans
+  [`cockpit-alerting-custom-rules`](../cockpit-alerting-custom-rules), une
+  instance par ressource. Ajouter les instances voulues dans le même apply que
+  la montée de version, sinon ces alertes disparaissent. Les groupes Mimir
+  sont supprimés puis recréés sous un nouveau nom
+  (`Custom Rules - <Type> - <resource_name|all>`), sans collision avec les
+  anciens.
+- La variable `public_gateway_size` est supprimée (à passer désormais à
+  l'instance `cockpit-alerting-custom-rules` de `type = "public_gateway"`).
