@@ -10,5 +10,5 @@
   "modules/bastion": "1.2.0",
   "modules/cockpit-alerting": "2.2.2",
   "modules/external-secret": "1.2.0",
-  "modules/cockpit-alerting-custom-rules": "0.0.0"
+  "modules/cockpit-alerting-custom-rules": "1.0.0"
 }
