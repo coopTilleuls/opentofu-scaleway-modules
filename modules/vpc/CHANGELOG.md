@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/vpc-v1.1.0...vpc-v1.2.0) (2026-09-29)
+
+
+### Features
+
+* **kubernetes-cluster:** autoscaler config ([23fa44e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/23fa44e2009964fef8aa5cfa4532cf75e9174ed0))
+* **kubernetes-cluster:** empty commit ([b9de0ae](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b9de0aefa29669e7c517e5f3fe40bcbe8a32cae5))
+* **vpc:** expose public gateway names as output ([8ca5d44](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8ca5d4427638681589e02b9e84ec31322c4111c0))
+* **vpc:** expose public gateway names as output ([c7a6e2c](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/c7a6e2cb2439163a7476d127f47383ce6193246c))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/vpc-v1.0.0...vpc-v1.1.0) (2026-08-05)
 
 
