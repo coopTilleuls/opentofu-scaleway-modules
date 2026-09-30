@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v3.0.0...cockpit-alerting-v3.1.0) (2026-09-30)
+
+
+### Features
+
+* **cockpit-alerting:** add exclude_predefined_rules variable ([bdf776c](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/bdf776c30919f1e9bef7b9975134e57ffa8ef945))
+* **cockpit-alerting:** add exclude_predefined_rules variable ([efcfab2](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/efcfab23a59fe47a26cbf10d75527c20a393de51))
+
 ## [3.0.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.2.2...cockpit-alerting-v3.0.0) (2026-09-29)
 
 
