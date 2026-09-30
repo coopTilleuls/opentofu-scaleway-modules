@@ -64,6 +64,10 @@ module "cockpit_alerting" {
     location   = "Europe/Paris"
   }
 
+  # optionnel, vide par défaut : groupes d'alertes préconfigurées Scaleway à ne pas créer, par
+  # product_name (ou nom complet "<product_family> - <product_name>"), insensible à la casse
+  exclude_predefined_rules = ["PostgreSQL", "Kubernetes"]
+
   # optionnel : règles vraiment spécifiques au projet. Pour les règles standard par type de
   # ressource (PostgreSQL, public gateway, ETCD...), utiliser cockpit-alerting-custom-rules.
   custom_rules_groups = [
@@ -126,7 +130,9 @@ provider "mimir" {
 - **`predefined_alerts_usage`** (seuils, expressions patchées, activation
   par alerte préconfigurée Scaleway) est figé dans ce module, pas exposé en
   variable : c'est la logique qu'on veut identique sur tous les projets.
-  Seul `custom_rules_groups` varie par projet.
+  Seuls `custom_rules_groups` et `exclude_predefined_rules` (qui retire des
+  groupes entiers, ex. `["PostgreSQL"]` pour ne pas créer `Managed Databases -
+  PostgreSQL`) varient par projet.
 - **Routage `service_level`** : les alertes `severity=critical` portant le
   label `service_level="5/7"` (posé par
   [`cockpit-alerting-custom-rules`](../cockpit-alerting-custom-rules)) ne
