@@ -240,8 +240,126 @@ locals {
     }
   }
 
-  group      = local.rules_groups[var.type]
+  # Alertes préconfigurées Scaleway ajoutées au jeu de règles du type, par nom d'alerte, et patchées
+  # comme dans le module cockpit-alerting (mêmes seuils/durées) pour les avoir en pourcentage avec
+  # des seuils warning/critical. Seules les alertes listées sont gardées. Pour ne pas les avoir en
+  # double, les exclure de cockpit-alerting via exclude_predefined_rules.
+  #
+  # Optional in each alert :
+  # - expression_regex_1 and expression_replacement_1
+  # - expression_regex_2 and expression_replacement_2
+  # - description_regex and description_replacement
+  # - comparaison : if need to change comparaison operator
+  predefined_alerts_usage = {
+    postgresql = {
+      group = "Managed Databases - PostgreSQL"
+      alerts = {
+        "PostgreSQLHighCPULoad" = {
+          expression_regex_1       = "/^/"
+          expression_replacement_1 = "100 * ("
+          expression_regex_2       = "/ > 0\\.8/"
+          expression_replacement_2 = ")"
+          description_regex        = "to 80% since 10m"
+          description_replacement  = "to THRESHOLD% since DURATION"
+          threshold = {
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "10m"
+            critical = "3m"
+          }
+        }
+        "PostgreSQLHighStorageUsage" = {
+          expression_regex_1       = "/^/"
+          expression_replacement_1 = "100 * ("
+          expression_regex_2       = "/ > 0\\.8/"
+          expression_replacement_2 = ")"
+          description_regex        = "to 80% since 10m"
+          description_replacement  = "to THRESHOLD% since DURATION"
+          threshold = {
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "3m"
+            critical = "3m"
+          }
+        }
+        "PostgresqlTooManyConnections" = {
+          expression_regex_1       = "/^/"
+          expression_replacement_1 = "100 * ("
+          expression_regex_2       = "/ > 0\\.8/"
+          expression_replacement_2 = ")"
+          description_regex        = "to 80% since 10m"
+          description_replacement  = "to THRESHOLD% since DURATION"
+          threshold = {
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "3m"
+            critical = "3m"
+          }
+        }
+      }
+    }
+  }
+
+  predefined = lookup(local.predefined_alerts_usage, var.type, null)
+
+  # Les expressions Scaleway ne suivent pas un format commun (sélecteur avec ou sans labels) : au
+  # lieu d'y injecter local.selector, on filtre le résultat sur resource_name par une jointure avec
+  # un vecteur constant portant ce seul label. Toutes les alertes préconfigurées gardent le label
+  # resource_name dans leur résultat. Parenthèses externes : l'opérateur de comparaison ajouté
+  # ensuite est prioritaire sur "and".
+  predefined_filter = var.resource_name == null ? null : "and on(resource_name) label_replace(vector(1), \"resource_name\", \"${var.resource_name}\", \"\", \"\")"
+
+  rules_from_predefined = local.predefined == null ? [] : [
+    for alert in data.scaleway_cockpit_preconfigured_alert.this[0].alerts : {
+      name      = alert.name
+      threshold = local.predefined.alerts[alert.name].threshold
+      duration  = local.predefined.alerts[alert.name].duration
+      # patch rule avec regex prefix et suffix: "100 * (" et remplacer "> 0.8" par ")" pour l'avoir en pourcentage, et pour enlever l'operateur de comparaison et le seuil qu'on passe separement
+      expression = format(
+        local.predefined_filter == null ? "%s" : "((%s) ${local.predefined_filter})",
+        replace(
+          replace(
+            alert.rule,
+            try(local.predefined.alerts[alert.name].expression_regex_1, "/do_not_match/"),
+            try(local.predefined.alerts[alert.name].expression_replacement_1, "SHOULD_NOT_BE_USED")
+          ),
+          try(local.predefined.alerts[alert.name].expression_regex_2, "/do_not_match/"),
+          try(local.predefined.alerts[alert.name].expression_replacement_2, "SHOULD_NOT_BE_USED")
+        )
+      )
+      annotations = alert.annotations
+      # même runbook que les alertes créées par cockpit-alerting
+      runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/${replace(local.predefined.group, "/[^a-zA-Z]/", "")}/${replace(alert.name, "/[^a-zA-Z]/", "")}"
+      # patch description avec regex "to THRESHOLD% since DURATION"
+      description = replace(
+        alert.annotations.description,
+        try(local.predefined.alerts[alert.name].description_regex, "/do_not_match/"),
+        try(local.predefined.alerts[alert.name].description_replacement, "SHOULD_NOT_BE_USED")
+      )
+      comparaison = try(local.predefined.alerts[alert.name].comparaison, regex("( )(>|>=|<|<=|=)( )", alert.rule)[1])
+    } if "${alert.product_family} - ${alert.product_name}" == local.predefined.group
+    && contains(keys(local.predefined.alerts), alert.name)
+  ]
+
+  group = {
+    name  = local.rules_groups[var.type].name
+    rules = concat(local.rules_groups[var.type].rules, local.rules_from_predefined)
+  }
   group_name = "${local.group.name} - ${coalesce(var.resource_name, "all")}"
+}
+
+# Uniquement pour les types qui reprennent des alertes préconfigurées (cf. predefined_alerts_usage)
+data "scaleway_cockpit_preconfigured_alert" "this" {
+  count = local.predefined == null ? 0 : 1
+
+  project_id = var.project_id
+  region     = var.region
 }
 
 resource "mimir_rule_group_alerting" "this" {
