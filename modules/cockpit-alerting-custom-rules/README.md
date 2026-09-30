@@ -16,7 +16,7 @@ Ces règles étaient auparavant codées en dur dans `cockpit-alerting`
 | `kubernetes` | ETCD disk quota, CPU API server (control plane Kapsule) |
 | `s2s_vpn` | Bande passante entrante / sortante |
 | `public_gateway` | Bande passante entrante / sortante (nécessite `public_gateway_size`) |
-| `postgresql` | Mémoire RDB PostgreSQL |
+| `postgresql` | Mémoire, CPU, stockage, connexions RDB PostgreSQL |
 | `opensearch` | CPU, mémoire, load average |
 
 | `service_level` | Alertes critical |
@@ -25,6 +25,14 @@ Ces règles étaient auparavant codées en dur dans `cockpit-alerting`
 | `5/7` | Vers `webhook_url_critical` aux heures ouvrées (`business_hours` de `cockpit-alerting`, par défaut lun-ven 09:00-18:00 Europe/Paris), vers `webhook_url_warning` en dehors |
 
 Les alertes warning ne dépendent pas du `service_level`.
+
+Le type `postgresql` reprend aussi les alertes préconfigurées Scaleway
+`Managed Databases - PostgreSQL` (CPU, stockage, connexions), récupérées via
+`data.scaleway_cockpit_preconfigured_alert` et patchées avec les mêmes seuils,
+durées et runbooks que dans `cockpit-alerting`. Comme `cockpit-alerting` les
+crée déjà pour tout le projet, les en exclure pour éviter les doublons :
+`exclude_predefined_rules = ["PostgreSQL"]`, et instancier alors ce module pour
+**chaque** base PostgreSQL (sinon les bases non couvertes perdent ces alertes).
 
 ## Exemple
 
@@ -55,13 +63,18 @@ module "alerting_rules_kubernetes" {
 }
 ```
 
-Le provider `mimir` est celui déjà configuré par l'appelant pour
-`cockpit-alerting` (cf. son README) : ce module n'en déclare pas.
+Les providers `mimir` et `scaleway` sont ceux déjà configurés par l'appelant
+pour `cockpit-alerting` (cf. son README) : ce module n'en déclare pas.
+`project_id` et `region` (optionnels, par défaut ceux du provider) ne servent
+qu'à la lecture des alertes préconfigurées, pour les types qui en reprennent.
 
 ## Remarques
 
 - **`resource_name`** filtre chaque expression PromQL sur le label
-  `resource_name` des métriques Cockpit. À `null`, le groupe couvre toutes les
+  `resource_name` des métriques Cockpit. Pour les alertes préconfigurées, dont
+  les expressions n'ont pas un format commun, le filtre est une jointure
+  `and on(resource_name) label_replace(vector(1), "resource_name", "<nom>", "", "")`
+  sur le résultat. À `null`, le groupe couvre toutes les
   ressources du type : ne pas le combiner avec une autre instance du même
   `type` filtrée sur une ressource, sinon cette ressource aura des alertes en
   double.
@@ -71,6 +84,10 @@ Le provider `mimir` est celui déjà configuré par l'appelant pour
 - Le routage `service_level` est porté par le module `cockpit-alerting`
   (routes Alertmanager sur le label `service_level`) : avec une version
   antérieure à 3.0.0, le label est posé mais sans effet.
+- Pour reprendre les alertes préconfigurées dans un autre `type`, ajouter une
+  entrée dans `local.predefined_alerts_usage` (`main.tf`) avec le groupe
+  Scaleway (`"<product_family> - <product_name>"`) et les alertes à garder,
+  dans le même format que dans `cockpit-alerting`.
 - Seuils et durées sont figés dans le module, comme dans `cockpit-alerting`.
   Pour une règle vraiment spécifique à un projet, utiliser
   `custom_rules_groups` de `cockpit-alerting`.

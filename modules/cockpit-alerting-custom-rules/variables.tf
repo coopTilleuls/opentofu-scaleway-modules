@@ -56,3 +56,15 @@ variable "labels" {
   type        = map(string)
   default     = {}
 }
+
+variable "project_id" {
+  description = "ID du projet Scaleway dont on récupère les alertes préconfigurées Cockpit (types `postgresql`). Laisser à null pour utiliser le projet par défaut du provider."
+  type        = string
+  default     = null
+}
+
+variable "region" {
+  description = "Région Scaleway des alertes préconfigurées Cockpit. Laisser à null pour utiliser la région par défaut du provider."
+  type        = string
+  default     = null
+}
