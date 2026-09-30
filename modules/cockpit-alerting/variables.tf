@@ -119,3 +119,15 @@ variable "business_hours" {
     error_message = "business_hours.start_time et end_time doivent être au format HH:MM."
   }
 }
+
+variable "exclude_predefined_rules" {
+  description = <<-EOT
+    Groupes d'alertes préconfigurées Scaleway à ne pas créer, désignés par leur `product_name`
+    (ex. `["PostgreSQL", "Kubernetes"]` exclut `Managed Databases - PostgreSQL` et
+    `Containers - Kubernetes`) ou par leur nom complet `"<product_family> - <product_name>"`.
+    Comparaison insensible à la casse. N'affecte pas `custom_rules_groups`.
+  EOT
+  type        = list(string)
+  default     = []
+  nullable    = false
+}

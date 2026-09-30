@@ -405,7 +405,14 @@ locals {
   # on les prend depuis data.scaleway_cockpit_preconfigured_alert.all
   # on les groupe par product_family - product_name
   # on les filtre fonction de predefined_alerts_usage, pour savoir celles qu'on garde ou pas, et comment on la patch pour les seuils warning/critical
-  scaleway_cockpit_preconfigured_alert_groups = distinct([for alert in data.scaleway_cockpit_preconfigured_alert.all.alerts : "${alert.product_family} - ${alert.product_name}"])
+  # on exclut les groupes dont le product_name (ou le nom complet "product_family - product_name")
+  # figure dans var.exclude_predefined_rules, sans tenir compte de la casse
+  exclude_predefined_rules = [for name in var.exclude_predefined_rules : lower(name)]
+  scaleway_cockpit_preconfigured_alert_groups = distinct([
+    for alert in data.scaleway_cockpit_preconfigured_alert.all.alerts : "${alert.product_family} - ${alert.product_name}"
+    if !contains(local.exclude_predefined_rules, lower(alert.product_name))
+    && !contains(local.exclude_predefined_rules, lower("${alert.product_family} - ${alert.product_name}"))
+  ])
 
   custom_rules_groups_from_predefined = [
     for group in local.scaleway_cockpit_preconfigured_alert_groups : {
