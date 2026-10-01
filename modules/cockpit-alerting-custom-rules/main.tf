@@ -197,25 +197,26 @@ locals {
           description = "OpenSearch node {{ $labels.node }} has a CPU usage superior to THRESHOLD% since DURATION"
           runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/CPU"
         },
-        {
-          name = "Memory"
-          threshold = {
-            # en %
-            warning  = 90
-            critical = 95
-          }
-          duration = {
-            warning  = "10m"
-            critical = "20m"
-          }
-          expression  = "100 - sedb_deployment_opensearch_os_mem_free_percent{${local.selector}}"
-          comparaison = ">"
-          annotations = {
-            summary = "High Memory usage on node {{ $labels.node }} of OpenSearch cluster {{ $labels.resource_name }} service {{ $labels.service }}."
-          }
-          description = "OpenSearch node {{ $labels.node }} of cluster {{ $labels.resource_name}}, for service {{ $labels.service }},  has a Memory usage superior to THRESHOLD% since DURATION"
-          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/Memory"
-        },
+        # Disabled until case 1616390 answer : this is not the good metric
+        #{
+        #  name = "Memory"
+        #  threshold = {
+        #    # en %
+        #    warning  = 90
+        #    critical = 95
+        #  }
+        #  duration = {
+        #    warning  = "10m"
+        #    critical = "20m"
+        #  }
+        #  expression  = "100 - sedb_deployment_opensearch_os_mem_free_percent{${local.selector}}"
+        #  comparaison = ">"
+        #  annotations = {
+        #    summary = "High Memory usage on node {{ $labels.node }} of OpenSearch cluster {{ $labels.resource_name }} service {{ $labels.service }}."
+        #  }
+        #  description = "OpenSearch node {{ $labels.node }} of cluster {{ $labels.resource_name}}, for service {{ $labels.service }},  has a Memory usage superior to THRESHOLD% since DURATION"
+        #  runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/Memory"
+        #},
         {
           name = "Load average"
           threshold = {
