@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.1.0...cockpit-alerting-custom-rules-v1.1.1) (2026-10-01)
+
+
+### Bug Fixes
+
+* **cockpit-alerting-custom-rules:** disable memory rule ([1d352dd](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/1d352dda5ce4ead7e06241c83a94d3641a43edbd))
+
 ## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.0.0...cockpit-alerting-custom-rules-v1.1.0) (2026-09-30)
 
 
