@@ -57,13 +57,6 @@ module "cockpit_alerting" {
   logs_name    = "logs-source"
   traces_name  = "traces-source"
 
-  # optionnel, valeurs par défaut ci-dessous : heures ouvrées pour service_level = "5/7"
-  business_hours = {
-    start_time = "09:00"
-    end_time   = "18:00"
-    location   = "Europe/Paris"
-  }
-
   # optionnel, vide par défaut : groupes d'alertes préconfigurées Scaleway à ne pas créer, par
   # product_name (ou nom complet "<product_family> - <product_name>"), insensible à la casse
   exclude_predefined_rules = ["PostgreSQL", "Kubernetes"]
@@ -94,7 +87,7 @@ module "alerting_rules_db_app" {
   source = "git::https://<repo-url>//modules/cockpit-alerting-custom-rules?ref=cockpit-alerting-custom-rules-vX.Y.Z"
 
   type          = "postgresql"
-  service_level = "5/7"
+  service_level = "7/5"
   resource_name = "app-db"
 }
 
@@ -133,14 +126,6 @@ provider "mimir" {
   Seuls `custom_rules_groups` et `exclude_predefined_rules` (qui retire des
   groupes entiers, ex. `["PostgreSQL"]` pour ne pas créer `Managed Databases -
   PostgreSQL`) varient par projet.
-- **Routage `service_level`** : les alertes `severity=critical` portant le
-  label `service_level="5/7"` (posé par
-  [`cockpit-alerting-custom-rules`](../cockpit-alerting-custom-rules)) ne
-  partent vers `webhook_url_critical` qu'aux heures ouvrées
-  (`business_hours`, lundi-vendredi, jours fériés non gérés), et vers
-  `webhook_url_warning` le reste du temps. Toute autre alerte critical
-  (`24/7`, alertes préconfigurées, `custom_rules_groups`) part toujours vers
-  `webhook_url_critical`.
 - **`webhook_url_critical`/`_warning`/`_info`** sont des variables
   obligatoires et sensibles (`sensitive = true`) : ce module ne fixe plus
   aucune URL de webhook en interne. À passer via `TF_VAR_...` ou un backend

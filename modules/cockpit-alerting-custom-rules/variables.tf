@@ -16,16 +16,15 @@ variable "service_level" {
   description = <<-EOT
     Niveau de service de la ressource, posé en label `service_level` sur chaque alerte :
     - `24/7` : les alertes critical partent toujours vers le webhook critical.
-    - `5/7` : les alertes critical ne partent vers le webhook critical qu'aux heures ouvrées
-      (cf. `business_hours` du module `cockpit-alerting`), et vers le webhook warning le reste du
-      temps.
+    - `7/5` : les alertes critical partent vers le webhook warning qui n’alerte qu’en journée
     Le routage lui-même est fait par le module `cockpit-alerting` (>= 3.0.0).
   EOT
   type        = string
+  default     = "24/7"
 
   validation {
-    condition     = contains(["24/7", "5/7"], var.service_level)
-    error_message = "service_level doit valoir \"24/7\" ou \"5/7\"."
+    condition     = contains(["24/7", "7/5"], var.service_level)
+    error_message = "service_level doit valoir \"24/7\" ou \"7/5\"."
   }
 }
 

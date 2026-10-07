@@ -385,8 +385,7 @@ resource "mimir_rule_group_alerting" "this" {
       labels = merge(
         var.labels,
         {
-          severity      = rule.value.severity
-          service_level = var.service_level
+          severity      = var.service_level == "24/7" ? rule.value.severity : "warning"
         }
       )
       annotations = merge(

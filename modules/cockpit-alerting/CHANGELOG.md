@@ -17,7 +17,7 @@
 
 ### Features
 
-* **cockpit-alerting:** move additional rules to cockpit-alerting-custom-rules, add 5/7 routing ([98fdf17](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/98fdf17cd99aa9221488e179fafe8d208501d766))
+* **cockpit-alerting:** move additional rules to cockpit-alerting-custom-rules, add 7/5 routing ([98fdf17](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/98fdf17cd99aa9221488e179fafe8d208501d766))
 
 ## [2.2.2](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v2.2.1...cockpit-alerting-v2.2.2) (2026-09-09)
 

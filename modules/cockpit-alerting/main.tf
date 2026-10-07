@@ -475,35 +475,6 @@ resource "mimir_alertmanager_config" "this" {
       repeat_interval = "1h"
     }
 
-    # service_level="5/7" (cf. module cockpit-alerting-custom-rules) : critical aux heures
-    # ouvrées, warning en dehors. Les deux routes matchent (continue = true sur la première),
-    # et une seule est active à un instant donné.
-    child_route {
-      matchers = [
-        "severity=\"critical\"",
-        "service_level=\"5/7\"",
-      ]
-      receiver              = "critical"
-      group_wait            = "30s"
-      group_interval        = "5m"
-      repeat_interval       = "20m"
-      active_time_intervals = ["business_hours"]
-      continue              = true
-    }
-
-    child_route {
-      matchers = [
-        "severity=\"critical\"",
-        "service_level=\"5/7\"",
-      ]
-      receiver            = "warning"
-      group_wait          = "30s"
-      group_interval      = "5m"
-      repeat_interval     = "1h"
-      mute_time_intervals = ["business_hours"]
-    }
-
-    # service_level="24/7" ou absent (alertes préconfigurées, custom_rules_groups)
     child_route {
       matchers = [
         "severity=\"critical\"",
@@ -512,22 +483,6 @@ resource "mimir_alertmanager_config" "this" {
       group_wait      = "30s"
       group_interval  = "5m"
       repeat_interval = "20m"
-    }
-  }
-
-  time_interval {
-    name = "business_hours"
-    time_intervals {
-      location = var.business_hours.location
-      # 0 = dimanche, 6 = samedi
-      weekdays {
-        begin = 1
-        end   = 5
-      }
-      times {
-        start_time = var.business_hours.start_time
-        end_time   = var.business_hours.end_time
-      }
     }
   }
 

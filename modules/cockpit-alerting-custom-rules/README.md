@@ -22,7 +22,7 @@ Ces règles étaient auparavant codées en dur dans `cockpit-alerting`
 | `service_level` | Alertes critical |
 |---|---|
 | `24/7` | Toujours vers `webhook_url_critical` |
-| `5/7` | Vers `webhook_url_critical` aux heures ouvrées (`business_hours` de `cockpit-alerting`, par défaut lun-ven 09:00-18:00 Europe/Paris), vers `webhook_url_warning` en dehors |
+| `7/5` | Vers `webhook_url_warning` |
 
 Les alertes warning ne dépendent pas du `service_level`.
 
@@ -49,7 +49,7 @@ module "alerting_rules_public_gateway" {
   source = "git::https://<repo-url>//modules/cockpit-alerting-custom-rules?ref=cockpit-alerting-custom-rules-vX.Y.Z"
 
   type                = "public_gateway"
-  service_level       = "5/7"
+  service_level       = "7/5"
   resource_name       = "my-gateway"
   public_gateway_size = "M"
 }
