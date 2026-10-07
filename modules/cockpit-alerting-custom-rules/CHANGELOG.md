@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.1.1...cockpit-alerting-custom-rules-v1.2.0) (2026-10-07)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** clean service levels ([b4bb473](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b4bb473163d1da04e660009e2f346c9f2c3fc382))
+* **cockpit-alerting:** clean routes ([8258a2b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8258a2bbcbc6e71544f64d552ae71771c5bf0e13))
+
 ## [1.1.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.1.0...cockpit-alerting-custom-rules-v1.1.1) (2026-10-01)
 
 
