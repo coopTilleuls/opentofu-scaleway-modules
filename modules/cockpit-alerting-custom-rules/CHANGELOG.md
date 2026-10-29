@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.3.0...cockpit-alerting-custom-rules-v1.4.0) (2026-10-29)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** add rules_overrides to override thresholds and durations per rule ([d8792d3](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/d8792d3df6ae99708ff928edefbb1882ea5f9c32))
+* **cockpit-alerting-custom-rules:** add rules_overrides to override thresholds and durations per rule ([b02a36d](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b02a36de22c3ba91287d5b98962b5684bd792056))
+
 ## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.2.0...cockpit-alerting-custom-rules-v1.3.0) (2026-10-29)
 
 
