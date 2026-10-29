@@ -91,11 +91,18 @@ qu'à la lecture des alertes préconfigurées, pour les types qui en reprennent.
 - Seuils et durées ont des valeurs par défaut dans le module, surchargeables
   par règle et par sévérité avec `rules_overrides` (clé : nom de la règle, ou
   nom de l'alerte préconfigurée Scaleway). Les `THRESHOLD` / `DURATION` de la
-  description suivent la surcharge :
+  description suivent la surcharge. On peut aussi, par sévérité, ajouter ou
+  remplacer des annotations (`annotations`) et faire un remplacement dans
+  l'expression PromQL (`expression_replace`, même sémantique que `replace()` :
+  `search` littéral, ou regex si entouré de `/`) :
 
   ```hcl
   rules_overrides = {
-    PostgreSQLHighCPULoad = { duration = { critical = "6m" } }
+    PostgreSQLHighCPULoad = {
+      duration           = { critical = "6m" }
+      annotations        = { critical = { display_description = "> 90 % for 6 minutes" } }
+      expression_replace = { critical = { search = "[5m]", replace = "[6m]" } }
+    }
   }
   ```
 
