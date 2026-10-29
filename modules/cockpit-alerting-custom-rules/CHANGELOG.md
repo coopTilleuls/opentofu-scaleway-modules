@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.4.0...cockpit-alerting-custom-rules-v1.5.0) (2026-10-29)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** add annotations and expression_replace to rules_overrides ([4adcc5a](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/4adcc5a470d46032559d0d16596a7a312c8b696b))
+* **cockpit-alerting-custom-rules:** add annotations and expression_replace to rules_overrides ([0ebc178](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/0ebc1780f8faf84582a6e22ea9bd2863cb0094fa))
+
 ## [1.4.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.3.0...cockpit-alerting-custom-rules-v1.4.0) (2026-10-29)
 
 
