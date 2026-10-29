@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.2.0...cockpit-alerting-custom-rules-v1.3.0) (2026-10-29)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** add opensearch disk monitor ([d92eae7](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/d92eae78a4137a6713f2275111fb6b5773a8f368))
+
 ## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-custom-rules-v1.1.1...cockpit-alerting-custom-rules-v1.2.0) (2026-10-07)
 
 
