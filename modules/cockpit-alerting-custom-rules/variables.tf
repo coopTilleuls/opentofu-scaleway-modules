@@ -67,3 +67,17 @@ variable "region" {
   type        = string
   default     = null
 }
+
+variable "rules_overrides" {
+  description = <<-EOT
+    Surcharge des seuils et durées de certaines règles, par nom de règle (ex. `Memory`, ou le nom
+    de l'alerte préconfigurée Scaleway, ex. `PostgreSQLHighCPULoad`), puis par sévérité
+    (`warning` / `critical`). Les sévérités non précisées gardent la valeur par défaut du module.
+    Ex. `{ PostgreSQLHighCPULoad = { duration = { critical = "6m" } } }`.
+  EOT
+  type = map(object({
+    threshold = optional(map(number), {})
+    duration  = optional(map(string), {})
+  }))
+  default = {}
+}

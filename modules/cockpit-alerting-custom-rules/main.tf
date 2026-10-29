@@ -367,8 +367,13 @@ locals {
   ]
 
   group = {
-    name  = local.rules_groups[var.type].name
-    rules = concat(local.rules_groups[var.type].rules, local.rules_from_predefined)
+    name = local.rules_groups[var.type].name
+    rules = [
+      for rule in concat(local.rules_groups[var.type].rules, local.rules_from_predefined) : merge(rule, {
+        threshold = merge(rule.threshold, try(var.rules_overrides[rule.name].threshold, {}))
+        duration  = merge(rule.duration, try(var.rules_overrides[rule.name].duration, {}))
+      })
+    ]
   }
   group_name = "${local.group.name} - ${coalesce(var.resource_name, "all")}"
 }
@@ -403,7 +408,7 @@ resource "mimir_rule_group_alerting" "this" {
       labels = merge(
         var.labels,
         {
-          severity      = var.service_level == "24/7" ? rule.value.severity : "warning"
+          severity = var.service_level == "24/7" ? rule.value.severity : "warning"
         }
       )
       annotations = merge(
