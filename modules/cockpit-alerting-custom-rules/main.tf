@@ -372,6 +372,9 @@ locals {
       for rule in concat(local.rules_groups[var.type].rules, local.rules_from_predefined) : merge(rule, {
         threshold = merge(rule.threshold, try(var.rules_overrides[rule.name].threshold, {}))
         duration  = merge(rule.duration, try(var.rules_overrides[rule.name].duration, {}))
+        # par sévérité, appliqués dans la ressource
+        annotations_overrides = try(var.rules_overrides[rule.name].annotations, {})
+        expression_replace    = try(var.rules_overrides[rule.name].expression_replace, {})
       })
     ]
   }
@@ -396,7 +399,14 @@ resource "mimir_rule_group_alerting" "this" {
           {
             severity = severity
           },
-          rule
+          rule,
+          {
+            expression = contains(keys(rule.expression_replace), severity) ? replace(
+              rule.expression,
+              rule.expression_replace[severity].search,
+              rule.expression_replace[severity].replace
+            ) : rule.expression
+          }
         )
       ]
     ]) : "${rule.name}-${rule.severity}" => rule }
@@ -418,7 +428,8 @@ resource "mimir_rule_group_alerting" "this" {
           description = replace(replace(rule.value.description, "THRESHOLD", rule.value.threshold[rule.value.severity]), "DURATION", rule.value.duration[rule.value.severity])
           runbook_url = rule.value.runbook_url
           terraformed = "true"
-        }
+        },
+        lookup(rule.value.annotations_overrides, rule.value.severity, {})
       )
     }
   }

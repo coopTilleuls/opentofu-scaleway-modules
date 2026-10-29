@@ -70,14 +70,23 @@ variable "region" {
 
 variable "rules_overrides" {
   description = <<-EOT
-    Surcharge des seuils et durées de certaines règles, par nom de règle (ex. `Memory`, ou le nom
-    de l'alerte préconfigurée Scaleway, ex. `PostgreSQLHighCPULoad`), puis par sévérité
-    (`warning` / `critical`). Les sévérités non précisées gardent la valeur par défaut du module.
+    Surcharge de certaines règles, par nom de règle (ex. `Memory`, ou le nom de l'alerte
+    préconfigurée Scaleway, ex. `PostgreSQLHighCPULoad`), puis par sévérité (`warning` / `critical`).
+    Les sévérités non précisées gardent la valeur par défaut du module.
+    - threshold / duration   : seuil et durée (`for`)
+    - annotations            : annotations ajoutées ou remplacées (ex. `display_description`)
+    - expression_replace     : remplacement dans l'expression PromQL, avec la sémantique de
+                               `replace()` (`search` littéral, ou regex si entouré de `/`)
     Ex. `{ PostgreSQLHighCPULoad = { duration = { critical = "6m" } } }`.
   EOT
   type = map(object({
-    threshold = optional(map(number), {})
-    duration  = optional(map(string), {})
+    threshold   = optional(map(number), {})
+    duration    = optional(map(string), {})
+    annotations = optional(map(map(string)), {})
+    expression_replace = optional(map(object({
+      search  = string
+      replace = string
+    })), {})
   }))
   default = {}
 }
