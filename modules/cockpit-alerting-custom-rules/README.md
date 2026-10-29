@@ -88,6 +88,16 @@ qu'à la lecture des alertes préconfigurées, pour les types qui en reprennent.
   entrée dans `local.predefined_alerts_usage` (`main.tf`) avec le groupe
   Scaleway (`"<product_family> - <product_name>"`) et les alertes à garder,
   dans le même format que dans `cockpit-alerting`.
-- Seuils et durées sont figés dans le module, comme dans `cockpit-alerting`.
+- Seuils et durées ont des valeurs par défaut dans le module, surchargeables
+  par règle et par sévérité avec `rules_overrides` (clé : nom de la règle, ou
+  nom de l'alerte préconfigurée Scaleway). Les `THRESHOLD` / `DURATION` de la
+  description suivent la surcharge :
+
+  ```hcl
+  rules_overrides = {
+    PostgreSQLHighCPULoad = { duration = { critical = "6m" } }
+  }
+  ```
+
   Pour une règle vraiment spécifique à un projet, utiliser
   `custom_rules_groups` de `cockpit-alerting`.
