@@ -236,7 +236,25 @@ locals {
           description = "OpenSearch node {{ $labels.node }} has a Load average usage superior to THRESHOLD% since DURATION"
           runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/LoadAverage"
         },
-        # TODO: en attente case scaleway pour metrique utilisation disque
+        {
+          name = "Disk usage"
+          threshold = {
+            # en %
+            warning  = 80
+            critical = 90
+          }
+          duration = {
+            warning  = "10m"
+            critical = "10m"
+          }
+          expression  = "avg by(node,service) (100 * (1-(sedb_deployment_opensearch_fs_total_available_bytes{${local.selector}}/sedb_deployment_opensearch_fs_total_total_bytes{${local.selector}})))"
+          comparaison = ">"
+          annotations = {
+            summary = "High Disk usage on node {{ $labels.node }} of OpenSearch cluster."
+          }
+          description = "OpenSearch node {{ $labels.node }} has a disk usage superior to THRESHOLD% since DURATION"
+          runbook_url = "https://wiki-sre.les-tilleuls.solutions/Cloudproviders/Scaleway/Monitoring/IRP/CustomOpenSearch/DiskUsage"
+        },
       ]
     }
   }
