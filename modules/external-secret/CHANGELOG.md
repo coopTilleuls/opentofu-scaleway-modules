@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/external-secret-v1.2.0...external-secret-v1.3.0) (2026-11-12)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** clean service levels ([b4bb473](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b4bb473163d1da04e660009e2f346c9f2c3fc382))
+* **cockpit-alerting:** clean routes ([8258a2b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8258a2bbcbc6e71544f64d552ae71771c5bf0e13))
+
+
+### Bug Fixes
+
+* **external-secret:** handle empty allowed_secrets_ids in IAM policy condition ([dc26f33](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/dc26f3399a97e564e9b0860f1344b220bfc1a5b4))
+
 ## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/external-secret-v1.1.0...external-secret-v1.2.0) (2026-09-03)
 
 
