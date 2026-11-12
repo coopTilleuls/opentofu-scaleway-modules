@@ -29,7 +29,7 @@ resource "scaleway_secret_version" "external_secret_version" {
 locals {
   policy_condition = join("||", [for allowed_secret_id in var.allowed_secrets_ids : "resource.id == \"${split("/",allowed_secret_id)[1]}\"" ])
   # https://www.scaleway.com/en/docs/iam/reference-content/understanding-resource-level-conditions/#resource-level-conditions-and-listing-actions
-  policy_list_condition = "(${local.policy_condition}) || !has(resource.id)"
+  policy_list_condition = length(var.allowed_secrets_ids) > 0 ? "(${local.policy_condition}) || !has(resource.id)" : "!has(resource.id)"
   secret_store_name = "secretstore-${var.name}"
 }
 
