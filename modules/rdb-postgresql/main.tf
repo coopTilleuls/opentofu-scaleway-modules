@@ -65,6 +65,9 @@ locals {
   # Some settings are dependent of the instance size and/or storage type
   computed_settings = {
 
+    # PostgreSQL default is 300, Scaleway default is 30, they don’t know why
+    checkpoint_timeout = 300
+
     # effective_cache_size : 50% of memory if nothing specified (hot reload)
     effective_cache_size = lookup(local.node_type_mem,var.node_type)*1024/2
 
