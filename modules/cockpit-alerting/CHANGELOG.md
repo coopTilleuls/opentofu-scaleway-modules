@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v3.2.0...cockpit-alerting-v3.3.0) (2026-11-16)
+
+
+### Features
+
+* bastion dashboard (cockpit-alerting) + module cockpit-alerting-logs-rules ([ee6914e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/ee6914e147aaceb609930890990cd91318816bd1))
+* **cockpit-alerting:** add bastion SSH/auditd dashboard ([66028d0](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/66028d00701d74f5a1f4af674756d324220800e9))
+
 ## [3.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-v3.1.0...cockpit-alerting-v3.2.0) (2026-10-07)
 
 
