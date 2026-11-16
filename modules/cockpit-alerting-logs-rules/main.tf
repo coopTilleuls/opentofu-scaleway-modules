@@ -1,8 +1,10 @@
 locals {
   # Sélecteurs LogQL des flux poussés par Grafana Alloy (cf. rôle ansible alloy du repo appelant).
-  journald = "{host=\"${var.host}\", source=\"journald\"}"
-  sshd     = "{host=\"${var.host}\", unit=\"ssh.service\"}"
-  auditd   = "{host=\"${var.host}\", source=\"auditd\"}"
+  # journald peut rester silencieux plus d'une heure sur une machine au repos : la détection
+  # d'absence de logs se base sur un heartbeat explicite (cf. README, prérequis).
+  heartbeat = "{host=\"${var.host}\", source=\"journald\", syslog_identifier=\"alloy-heartbeat\"}"
+  sshd      = "{host=\"${var.host}\", unit=\"ssh.service\"}"
+  auditd    = "{host=\"${var.host}\", source=\"auditd\"}"
 
   # Utilisateur de connexion d'origine (AUID, conservé après sudo/su), ajouté par auditd en
   # log_format = ENRICHED (défaut Debian). On écarte :
@@ -43,11 +45,11 @@ locals {
         },
         {
           alert = "LogsAbsent"
-          expr  = "absent_over_time(${local.journald} [${var.logs_absent_duration}])"
+          expr  = "absent_over_time(${local.heartbeat} [${var.logs_absent_duration}])"
           for   = "0m"
           annotations = {
-            summary     = "Plus aucun log de ${var.host} depuis ${var.logs_absent_duration}"
-            description = "Aucun log journald reçu de ${var.host} depuis ${var.logs_absent_duration} : bastion arrêté, Grafana Alloy arrêté (systemctl status alloy) ou token Cockpit invalide."
+            summary     = "Plus aucun heartbeat de ${var.host} depuis ${var.logs_absent_duration}"
+            description = "Aucune ligne alloy-heartbeat reçue de ${var.host} depuis ${var.logs_absent_duration} : bastion arrêté, Grafana Alloy arrêté (systemctl status alloy), timer heartbeat arrêté (systemctl status alloy-heartbeat.timer) ou token Cockpit invalide."
           }
         },
       ]

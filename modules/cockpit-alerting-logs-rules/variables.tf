@@ -29,7 +29,7 @@ variable "ssh_auth_failures_threshold" {
 }
 
 variable "logs_absent_duration" {
-  description = "(`bastion`) Durée sans aucun log journald du host avant de déclencher l'alerte `LogsAbsent` (bastion arrêté, Alloy KO, token Cockpit invalide...)."
+  description = "(`bastion`) Durée sans heartbeat journald (`syslog_identifier=\"alloy-heartbeat\"`) avant de déclencher l'alerte `LogsAbsent` (bastion arrêté, Alloy KO, token Cockpit invalide...). Doit dépasser nettement la période du heartbeat."
   type        = string
   default     = "15m"
 }
