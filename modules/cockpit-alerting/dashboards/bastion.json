@@ -1,0 +1,950 @@
+{
+  "title": "Bastion - SSH et auditd",
+  "uid": "bastion-ssh-auditd",
+  "tags": [
+    "bastion",
+    "ssh",
+    "auditd",
+    "terraformed"
+  ],
+  "description": "Connexions SSH (journald) et événements auditd du bastion, envoyés vers Cockpit Loki par Grafana Alloy.",
+  "editable": true,
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "refresh": "5m",
+  "timezone": "browser",
+  "templating": {
+    "list": [
+      {
+        "name": "loki_ds",
+        "label": "Source de logs",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0,
+        "refresh": 1,
+        "regex": "",
+        "includeAll": false,
+        "multi": false
+      },
+      {
+        "name": "host",
+        "label": "Bastion",
+        "type": "query",
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_ds}"
+        },
+        "query": {
+          "label": "host",
+          "stream": "{source=\"auditd\"}",
+          "type": 1,
+          "refId": "LokiVariableQueryEditor-VariableQuery"
+        },
+        "definition": "label_values({source=\"auditd\"}, host)",
+        "refresh": 2,
+        "sort": 1,
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "multi": false
+      },
+      {
+        "name": "user",
+        "label": "Utilisateur (regex AUID)",
+        "type": "textbox",
+        "query": ".+",
+        "current": {
+          "text": ".+",
+          "value": ".+"
+        },
+        "hide": 0
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Connexions SSH (journald, unit ssh.service)",
+      "id": 1,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Connexions acceptées",
+      "id": 2,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum(count_over_time({host=\"$host\", unit=\"ssh.service\"} |= \"Accepted\" [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Échecs d'authentification",
+      "id": 3,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "Failed publickey/password, Invalid user, authentication failure (PAM).",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum(count_over_time({host=\"$host\", unit=\"ssh.service\"} |~ `Failed \\S+ for|Invalid user|authentication failure` [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Exports pg_dump (auditd)",
+      "id": 4,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "Exécutions de pg_dump (clé auditd pg_extract).",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum(count_over_time({host=\"$host\", source=\"auditd\"} |= `key=\"pg_extract\"` [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "purple"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Modifs de config sensible (auditd)",
+      "id": 5,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "Écritures sur sudoers, sshd_config, passwd/shadow/group, /etc/audit (clés sudoers, sshd, identity, audit_config).",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum(count_over_time({host=\"$host\", source=\"auditd\"} |~ `key=\"(sudoers|sshd|identity|audit_config)\"` [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "0",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "red"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Connexions SSH acceptées par utilisateur",
+      "id": 6,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum by (user) (count_over_time({host=\"$host\", unit=\"ssh.service\"} |= \"Accepted\" | regexp `Accepted (?P<method>\\S+) for (?P<user>\\S+) from (?P<ip>\\S+)` [$__interval]))",
+          "refId": "A",
+          "queryType": "range",
+          "legendFormat": "{{user}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Échecs d'authentification SSH",
+      "id": 7,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum(count_over_time({host=\"$host\", unit=\"ssh.service\"} |~ `Failed \\S+ for|Invalid user|authentication failure` [$__interval]))",
+          "refId": "A",
+          "queryType": "range",
+          "legendFormat": "échecs"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "Connexions acceptées : utilisateur / IP source",
+      "id": 8,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum by (user, ip, method) (count_over_time({host=\"$host\", unit=\"ssh.service\"} |= \"Accepted\" | regexp `Accepted (?P<method>\\S+) for (?P<user>\\S+) from (?P<ip>\\S+)` [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Connexions",
+              "user": "Utilisateur",
+              "ip": "IP source",
+              "method": "Méthode"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Connexions",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "type": "table",
+      "title": "Échecs : IP source",
+      "id": 9,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "topk(20, sum by (ip) (count_over_time({host=\"$host\", unit=\"ssh.service\"} |~ `Failed \\S+ for|Invalid user|authentication failure` | regexp `from (?P<ip>[0-9a-fA-F.:]+)` [$__range])))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Échecs",
+              "ip": "IP source"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Échecs",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "type": "logs",
+      "title": "Journal sshd (connexions, échecs, déconnexions)",
+      "id": 10,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "{host=\"$host\", unit=\"ssh.service\"} |~ `Accepted|Failed|Invalid user|Disconnected from|session (opened|closed)|Connection closed`",
+          "refId": "A",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true,
+        "dedupStrategy": "none"
+      }
+    },
+    {
+      "type": "row",
+      "title": "auditd (règles ansible roles/audit)",
+      "id": 11,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Événements auditd par clé (hors user_cmd)",
+      "id": 12,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "pg_extract (pg_dump), pg_access (psql), k8s (kubectl), pg_creds (lecture /home/admin), kubeconfig, sudoers, sshd, identity, audit_config.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum by (key) (count_over_time({host=\"$host\", source=\"auditd\"} |= \"key=\" != `key=\"user_cmd\"` != `key=(null)` | regexp `key=\"(?P<key>[^\"]+)\"` [$__interval]))",
+          "refId": "A",
+          "queryType": "range",
+          "legendFormat": "{{key}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Commandes lancées par utilisateur (user_cmd)",
+      "id": 13,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "Utilisateur de connexion d'origine (AUID), conservé après sudo/su. Nécessite log_format = ENRICHED (défaut Debian).",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum by (user) (count_over_time({host=\"$host\", source=\"auditd\"} |= `key=\"user_cmd\"` | regexp `AUID=\"(?P<user>[^\"]+)\"` [$__interval]))",
+          "refId": "A",
+          "queryType": "range",
+          "legendFormat": "{{user}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "Accès données / cluster par utilisateur (AUID)",
+      "id": 14,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum by (user, key) (count_over_time({host=\"$host\", source=\"auditd\"} |~ `key=\"(pg_extract|pg_access|pg_creds|k8s|kubeconfig)\"` | regexp `AUID=\"(?P<user>[^\"]+)\"` | regexp `key=\"(?P<key>[^\"]+)\"` [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Événements",
+              "user": "Utilisateur",
+              "key": "Clé"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Événements",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "type": "table",
+      "title": "Modifs de config sensible par utilisateur (AUID)",
+      "id": 15,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "sum by (user, key) (count_over_time({host=\"$host\", source=\"auditd\"} |~ `key=\"(sudoers|sshd|identity|audit_config)\"` | regexp `AUID=\"(?P<user>[^\"]+)\"` | regexp `key=\"(?P<key>[^\"]+)\"` [$__range]))",
+          "refId": "A",
+          "queryType": "instant"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Événements",
+              "user": "Utilisateur",
+              "key": "Clé"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Événements",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "type": "logs",
+      "title": "auditd : accès données / cluster / identifiants (pg_extract, pg_access, pg_creds, k8s, kubeconfig)",
+      "id": 16,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "{host=\"$host\", source=\"auditd\"} |~ `key=\"(pg_extract|pg_access|pg_creds|k8s|kubeconfig)\"` |~ `AUID=\"$user\"`",
+          "refId": "A",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true,
+        "dedupStrategy": "none"
+      }
+    },
+    {
+      "type": "logs",
+      "title": "auditd : config sensible (sudoers, sshd, identity, audit_config)",
+      "id": 17,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 58
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "{host=\"$host\", source=\"auditd\"} |~ `key=\"(sudoers|sshd|identity|audit_config)\"`",
+          "refId": "A",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true,
+        "dedupStrategy": "none"
+      }
+    },
+    {
+      "type": "logs",
+      "title": "auditd : commandes des utilisateurs (user_cmd), filtrées par $user",
+      "id": 18,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "{host=\"$host\", source=\"auditd\"} |= `key=\"user_cmd\"` |~ `AUID=\"$user\"`",
+          "refId": "A",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true,
+        "dedupStrategy": "none"
+      }
+    },
+    {
+      "type": "logs",
+      "title": "export_pg : log du cron d'export pg_dump",
+      "id": 19,
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki_ds}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 76
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_ds}"
+          },
+          "expr": "{host=\"$host\", source=\"export_pg\"}",
+          "refId": "A",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true,
+        "dedupStrategy": "none"
+      }
+    }
+  ]
+}

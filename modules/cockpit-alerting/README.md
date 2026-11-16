@@ -103,6 +103,37 @@ provider "mimir" {
 }
 ```
 
+## Dashboards
+
+Le module fournit des dashboards Grafana en JSON (`dashboards/`), exposés via l'output
+`dashboards`. Ils ne sont pas provisionnés par le module (pas de provider `grafana` imposé aux
+appelants) : les importer dans le Grafana Cockpit (Dashboards > New > Import, coller le JSON), ou
+les provisionner côté appelant. Les sources de données sont des variables du dashboard, à
+sélectionner après import.
+
+### `bastion` — SSH et auditd
+
+Pour un bastion (module `bastion`) dont Grafana Alloy pousse les logs vers la source Cockpit
+`logs` avec les labels :
+
+- `host` (ex. `bastion-prod`) sur tous les flux ;
+- `source="journald"` + `unit` (sshd = `unit="ssh.service"`) ;
+- `source="auditd"` : `/var/log/audit/audit.log` au format `ENRICHED` (défaut Debian), qui ajoute
+  le nom de l'utilisateur d'origine `AUID="..."` ;
+- `source="export_pg"` (optionnel) : log du cron d'export pg_dump.
+
+Contenu :
+
+- SSH : connexions acceptées par utilisateur / IP / méthode, échecs d'authentification et IP
+  sources, journal sshd ;
+- auditd : événements par clé, commandes par utilisateur (`user_cmd`), accès données / cluster
+  (`pg_extract`, `pg_access`, `pg_creds`, `k8s`, `kubeconfig`) et modifications de configuration
+  sensible (`sudoers`, `sshd`, `identity`, `audit_config`) par utilisateur, avec les logs bruts ;
+- variable `user` : regex sur `AUID` pour filtrer les panneaux de logs auditd sur un utilisateur.
+
+Les clés correspondent aux règles auditd du bastion (rôle ansible `audit` du repo appelant) :
+adapter les regex des panneaux si les clés changent.
+
 ## Remarques
 
 - **`scaleway_cockpit_token` et `scaleway_cockpit_alert_manager` (+

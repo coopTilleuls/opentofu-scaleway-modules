@@ -17,3 +17,15 @@ output "traces_source_url" {
   description = "URL de la source Cockpit de traces."
   value       = scaleway_cockpit_source.traces.url
 }
+
+output "dashboards" {
+  description = <<-EOT
+    Dashboards Grafana (JSON) fournis par le module, à importer dans le Grafana Cockpit
+    (Dashboards > New > Import) ou à provisionner par l'appelant (ex. `grafana_dashboard`).
+    Les sources de données sont des variables du dashboard (pas d'UID en dur) : ils sont portables
+    d'un projet à l'autre. Voir le README, section « Dashboards ».
+  EOT
+  value = {
+    bastion = file("${path.module}/dashboards/bastion.json")
+  }
+}

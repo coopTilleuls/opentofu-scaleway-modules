@@ -22,6 +22,7 @@ propre à chaque repo consommateur.
 | [`flux`](modules/flux) | Bootstrap FluxCD (namespace, deploy key, sealed-secrets, GitRepository/Kustomization) — **exception au périmètre** ci-dessous |
 | [`cockpit-alerting`](modules/cockpit-alerting) | Alerting Mimir d'un Cockpit Scaleway (alertes préconfigurées patchées + règles custom, routage OnCall) |
 | [`cockpit-alerting-custom-rules`](modules/cockpit-alerting-custom-rules) | Règles d'alerte Mimir par ressource (PostgreSQL, public gateway, ETCD...) avec niveau de service 24/7 ou 5/7 |
+| [`cockpit-alerting-logs-rules`](modules/cockpit-alerting-logs-rules) | Règles d'alerte Loki (LogQL) par ressource (bastion : pg_dump manuel, config sensible, échecs SSH, absence de logs) |
 | [`external-secret`](modules/external-secret) | Câblage Scaleway Secret Manager ↔ External Secrets Operator (IAM lecture seule, secret par namespace, SecretStore/ExternalSecret) — **exception au périmètre** ci-dessous |
 
 Les modules d'installation d'operators Kubernetes (ECK, RabbitMQ...) vivent dans le repo
