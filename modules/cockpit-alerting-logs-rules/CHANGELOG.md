@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/cockpit-alerting-logs-rules-v1.0.0...cockpit-alerting-logs-rules-v1.0.1) (2026-11-16)
+
+
+### Bug Fixes
+
+* **cockpit-alerting-logs-rules:** base LogsAbsent on a journald heartbeat ([2658f03](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/2658f03fd96185575536e8a20da8b3911e1add90))
+* **cockpit-alerting-logs-rules:** base LogsAbsent on a journald heartbeat ([8ca91d9](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8ca91d94ba03518ed20040d37d79a40a6fae733d))
+
 ## 1.0.0 (2026-11-16)
 
 
