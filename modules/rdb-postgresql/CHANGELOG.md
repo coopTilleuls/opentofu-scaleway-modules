@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.4.0...rdb-postgresql-v1.5.0) (2026-11-16)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** clean service levels ([b4bb473](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b4bb473163d1da04e660009e2f346c9f2c3fc382))
+* **cockpit-alerting:** clean routes ([8258a2b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8258a2bbcbc6e71544f64d552ae71771c5bf0e13))
+
+
+### Bug Fixes
+
+* **rdb-postgresql:** back to default Postgresql checkpoint_timeout ([35fa769](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/35fa7698a53fa7248ad42dca0956921a6a886883))
+
 ## [1.4.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/rdb-postgresql-v1.3.0...rdb-postgresql-v1.4.0) (2026-09-28)
 
 
