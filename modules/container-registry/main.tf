@@ -1,6 +1,7 @@
 # Ce module se limite volontairement à la création du namespace de registry : la clé de pull
 # (application IAM + policy ContainerRegistryReadOnly) est déléguée au module `iam-app-identity`,
 # pour éviter de dupliquer la logique IAM déjà couverte par ce dernier (cf. README).
+# La purge optionnelle des anciens tags (`var.retention`) est dans retention.tf.
 resource "scaleway_registry_namespace" "this" {
   name        = var.name
   description = var.description
