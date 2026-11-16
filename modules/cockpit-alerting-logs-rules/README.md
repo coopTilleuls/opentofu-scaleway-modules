@@ -24,11 +24,18 @@ Pour un bastion (module [`bastion`](../bastion)) avec auditd et Grafana Alloy d�
 | `ManualPgDump` | `pg_dump` (clé auditd `pg_extract`) lancé par un humain : AUID ni `root` (cron, via `pam_loginuid`) ni `unset` |
 | `SensitiveConfigChange` | écriture sur sudoers, sshd_config, passwd/shadow/group ou `/etc/audit` (clés `sudoers`, `sshd`, `identity`, `audit_config`) dans une session (AUID ≠ `unset`) — se déclenche aussi lors d'un déploiement ansible qui modifie ces fichiers (utilisateur `admin`) |
 | `SshAuthFailures` | plus de `ssh_auth_failures_threshold` (20) échecs d'authentification SSH en 10 min |
-| `LogsAbsent` | aucun log journald depuis `logs_absent_duration` (15m) : bastion ou Alloy arrêté, token invalide |
+| `LogsAbsent` | aucun heartbeat (`syslog_identifier="alloy-heartbeat"`) depuis `logs_absent_duration` (15m) : bastion, Alloy ou timer heartbeat arrêté, token invalide |
 
-Prérequis côté bastion : auditd en `log_format = ENRICHED` (défaut Debian), qui ajoute le nom
-d'utilisateur `AUID="..."` utilisé par `ManualPgDump` et `SensitiveConfigChange`, et clés auditd
-identiques à celles ci-dessus.
+Prérequis côté bastion :
+
+- un heartbeat journald plus fréquent que `logs_absent_duration`, avec l'identifiant
+  `alloy-heartbeat`, et Alloy qui pose le label `syslog_identifier` (relabel de
+  `__journal_syslog_identifier`). journald seul ne suffit pas : il peut rester silencieux plus
+  d'une heure sur un bastion au repos (faux positifs). Exemple de timer systemd toutes les 5 min :
+  `ExecStart=/usr/bin/logger -t alloy-heartbeat alive` + `OnUnitActiveSec=5min` ;
+- auditd en `log_format = ENRICHED` (défaut Debian), qui ajoute le nom d'utilisateur
+  `AUID="..."` utilisé par `ManualPgDump` et `SensitiveConfigChange`, et clés auditd identiques à
+  celles ci-dessus.
 
 Les labels `user` et `key` (extraits des logs) sont présents sur les alertes et utilisés dans les
 annotations ; chaque utilisateur / clé donne une alerte distincte.
