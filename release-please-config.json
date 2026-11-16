@@ -50,6 +50,10 @@
     "modules/cockpit-alerting-custom-rules": {
       "component": "cockpit-alerting-custom-rules",
       "changelog-path": "CHANGELOG.md"
+    },
+    "modules/cockpit-alerting-logs-rules": {
+      "component": "cockpit-alerting-logs-rules",
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }
