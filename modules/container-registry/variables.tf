@@ -34,15 +34,16 @@ variable "retention" {
     rattaché à la première règle de `rules` dont `tag_regex` le matche (un tag qui ne matche aucune
     règle, ou qui matche `protected_tag_regex`, est conservé). Dans une règle, les `keep_last` tags
     les plus récents de l'image sont conservés, les suivants sont supprimés s'ils ont plus de
-    `older_than_days` jours. Un tag partageant son digest avec un tag conservé n'est jamais
+    `older_than_days` jours (par défaut : 10 tags et 30 jours, les deux conditions devant être
+    remplies pour supprimer). Un tag partageant son digest avec un tag conservé n'est jamais
     supprimé. `empty_image_older_than_days` supprime en plus les images restées sans aucun tag.
     Commencer par `dry_run = true` et lire les logs du job.
   EOT
   type = object({
     rules = list(object({
       tag_regex       = string
-      keep_last       = optional(number, 0)
-      older_than_days = optional(number, 0)
+      keep_last       = optional(number, 10)
+      older_than_days = optional(number, 30)
     }))
     protected_tag_regex         = optional(string, "^latest$")
     image_regex                 = optional(string, ".*")
