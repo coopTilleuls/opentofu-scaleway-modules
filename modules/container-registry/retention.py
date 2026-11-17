@@ -56,8 +56,9 @@ DRY_RUN = env("DRY_RUN", "false").lower() == "true"
 RULES = [
     {
         "regex": re.compile(r["tag_regex"]),
-        "keep_last": int(r.get("keep_last") or 0),
-        "older_than_days": int(r.get("older_than_days") or 0),
+        # Les valeurs par défaut (10 / 30) sont appliquées côté Terraform (variables.tf).
+        "keep_last": int(r["keep_last"]),
+        "older_than_days": int(r["older_than_days"]),
     }
     for r in json.loads(env("RULES"))
 ]
