@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/container-registry-v1.0.0...container-registry-v1.1.0) (2026-11-17)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** clean service levels ([b4bb473](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b4bb473163d1da04e660009e2f346c9f2c3fc382))
+* **cockpit-alerting:** clean routes ([8258a2b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8258a2bbcbc6e71544f64d552ae71771c5bf0e13))
+* **container-registry:** purge planifiée des anciens tags via Serverless Job ([0c9b5f2](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/0c9b5f2289f3f1d4f14f14e7dc581a5129ece94d))
+* **container-registry:** règles de rétention par défaut à 10 tags et 30 jours ([be2d0fe](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/be2d0fec5a2b1b6c1fe7365f0d0d4cba821aafef))
+* **container-registry:** règles de rétention par défaut à 10 tags et 30 jours ([f4270cb](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/f4270cb2b1c2e134e9bce3c265f7c68392ddd58d))
+* **kubernetes-cluster:** autoscaler config ([23fa44e](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/23fa44e2009964fef8aa5cfa4532cf75e9174ed0))
+* **kubernetes-cluster:** empty commit ([b9de0ae](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b9de0aefa29669e7c517e5f3fe40bcbe8a32cae5))
+
 ## 1.0.0 (2026-07-21)
 
 
