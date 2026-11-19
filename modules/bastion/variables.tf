@@ -33,8 +33,8 @@ variable "private_network_id" {
 
 variable "allowed_cidrs" {
   description = "List of allowed CIDRs. drop all by default"
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "root_volume_size_gb" {
@@ -104,4 +104,16 @@ variable "ansible_triggers" {
   EOT
   type        = map(string)
   default     = {}
+}
+
+variable "ansible_environment" {
+  description = <<-EOT
+    Variables d'environnement supplémentaires passées à `ansible-playbook` (lues côté playbook via
+    `lookup('ansible.builtin.env', 'NOM')`). À privilégier sur `-e` pour les secrets (token
+    Cockpit, clés S3...) : ils n'apparaissent pas dans la ligne de commande. Un changement de ces
+    valeurs ne relance pas Ansible à lui seul : ajouter un hash dans `ansible_triggers` si besoin.
+  EOT
+  type        = map(string)
+  default     = {}
+  sensitive   = true
 }
