@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/bastion-v1.2.0...bastion-v1.3.0) (2026-11-19)
+
+
+### Features
+
+* **bastion:** variable ansible_environment ([0441933](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/0441933f182109af201837dd979b6529a5558c7a))
+* **bastion:** variable ansible_environment pour passer des variables d'environnement à ansible-playbook ([2c2e1fe](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/2c2e1fe739e8b1ea66afc159c8f944aaf763157c))
+* **cockpit-alerting-custom-rules:** clean service levels ([b4bb473](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b4bb473163d1da04e660009e2f346c9f2c3fc382))
+* **cockpit-alerting:** clean routes ([8258a2b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8258a2bbcbc6e71544f64d552ae71771c5bf0e13))
+
 ## [1.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/bastion-v1.1.0...bastion-v1.2.0) (2026-09-22)
 
 
