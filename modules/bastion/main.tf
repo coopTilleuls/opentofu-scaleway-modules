@@ -38,13 +38,13 @@ resource "scaleway_block_volume" "this" {
 }
 
 resource "scaleway_instance_server" "this" {
-  name       = var.name
-  type       = var.instance_type
-  image      = var.image
-  ip_id      = scaleway_instance_ip.this.id
-  project_id = var.project_id
-  zone       = var.zone
-  tags       = var.tags
+  name              = var.name
+  type              = var.instance_type
+  image             = var.image
+  ip_id             = scaleway_instance_ip.this.id
+  project_id        = var.project_id
+  zone              = var.zone
+  tags              = var.tags
   security_group_id = scaleway_instance_security_group.this.id
 
   dynamic "root_volume" {
@@ -97,8 +97,8 @@ resource "null_resource" "ansible" {
       var.ansible_extra_vars_file != null ? "-e @${var.ansible_extra_vars_file}" : "",
       var.ansible_playbook_path,
     ]))
-    environment = {
+    environment = merge(var.ansible_environment, {
       ANSIBLE_HOST_KEY_CHECKING = "False"
-    }
+    })
   }
 }
