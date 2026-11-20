@@ -54,6 +54,11 @@ module "bastion" {
   de ce module) : ce module ne porte aucune logique métier Ansible, seulement l'exécution.
 - Sans entrée dans `ansible_triggers` (ou si les fichiers référencés ne changent pas), Ansible ne
   se ré-exécute qu'à la création du bastion — comme n'importe quel `null_resource`.
+- `ansible_ssh_jump_host` (`{ host, user, port = 22 }`, défaut `null`) : rebond SSH pour joindre
+  le bastion (ex: bastion wireguard de la coop, quand `allowed_cidrs` ne laisse pas passer le poste
+  qui lance `tofu`). Appliqué au `remote-exec` (`bastion_host`) et à `ansible-playbook`
+  (`ProxyJump` via `ANSIBLE_SSH_COMMON_ARGS`) ; le jump host doit autoriser le TCP forwarding et
+  la clé doit être disponible dans l'agent SSH.
 - `ansible_environment` (map, sensible) : variables d'environnement passées à `ansible-playbook`,
   pour transmettre des secrets (token Cockpit, clés S3...) sans les exposer dans la ligne de
   commande. Ne déclenche pas de ré-exécution à elle seule : ajouter un hash de ces valeurs dans

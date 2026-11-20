@@ -117,3 +117,19 @@ variable "ansible_environment" {
   default     = {}
   sensitive   = true
 }
+
+variable "ansible_ssh_jump_host" {
+  description = <<-EOT
+    Rebond SSH (jump host) optionnel pour joindre le bastion : utilisé à la fois par le
+    `remote-exec` (`cloud-init status --wait`, via `bastion_host` du bloc `connection`) et par
+    `ansible-playbook` (`-o ProxyJump=...` via `ANSIBLE_SSH_COMMON_ARGS`). Le jump host doit
+    autoriser le TCP forwarding. Laisser à null (défaut) pour une connexion directe sur l'IP
+    publique du bastion.
+  EOT
+  type = object({
+    host = string
+    user = string
+    port = optional(number, 22)
+  })
+  default = null
+}
