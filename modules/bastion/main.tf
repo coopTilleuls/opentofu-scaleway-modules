@@ -63,6 +63,13 @@ resource "scaleway_instance_server" "this" {
   }
 }
 
+locals {
+  # Même rebond que le remote-exec (bloc connection ci-dessous), côté ansible-playbook (ssh système).
+  ansible_jump_env = var.ansible_ssh_jump_host == null ? {} : {
+    ANSIBLE_SSH_COMMON_ARGS = "-o ProxyJump=${var.ansible_ssh_jump_host.user}@${var.ansible_ssh_jump_host.host}:${var.ansible_ssh_jump_host.port}"
+  }
+}
+
 resource "null_resource" "ansible" {
   # Optionnel : exécute un playbook Ansible du repo consommateur contre le bastion, pour la
   # configuration ré-appliquable (comptes utilisateurs, etc.) que cloud-init ne sait gérer qu'une
@@ -81,6 +88,12 @@ resource "null_resource" "ansible" {
     user  = var.ansible_ssh_user
     host  = scaleway_instance_ip.this.address
     agent = true
+
+    # Rebond SSH optionnel (ex: bastion wireguard de la coop) : le remote-exec ci-dessous passe
+    # alors par ce jump host au lieu d'atteindre directement l'IP publique du bastion.
+    bastion_host = try(var.ansible_ssh_jump_host.host, null)
+    bastion_user = try(var.ansible_ssh_jump_host.user, null)
+    bastion_port = try(var.ansible_ssh_jump_host.port, null)
   }
 
   # S'assure que cloud-init (paquets, montage du volume additionnel...) a terminé avant qu'Ansible
@@ -97,7 +110,7 @@ resource "null_resource" "ansible" {
       var.ansible_extra_vars_file != null ? "-e @${var.ansible_extra_vars_file}" : "",
       var.ansible_playbook_path,
     ]))
-    environment = merge(var.ansible_environment, {
+    environment = merge(var.ansible_environment, local.ansible_jump_env, {
       ANSIBLE_HOST_KEY_CHECKING = "False"
     })
   }
