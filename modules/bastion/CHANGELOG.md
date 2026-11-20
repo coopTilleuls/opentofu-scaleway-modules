@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/bastion-v1.3.0...bastion-v1.4.0) (2026-11-20)
+
+
+### Features
+
+* **bastion:** variable ansible_ssh_jump_host pour joindre le bastion via un rebond SSH ([0018dd7](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/0018dd7b0ea62d4acdbba047c79cae46ebf40874))
+* **bastion:** variable ansible_ssh_jump_host pour joindre le bastion via un rebond SSH ([d916188](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/d916188504ba037beaf08845b9be65dfc49ab9d0))
+
 ## [1.3.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/bastion-v1.2.0...bastion-v1.3.0) (2026-11-19)
 
 
