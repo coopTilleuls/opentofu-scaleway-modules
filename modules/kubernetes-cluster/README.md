@@ -59,10 +59,35 @@ module "kubernetes" {
   ce module.
 - `pools` est une liste de familles de pools (nom + taints/labels + tailles) ; le module
   démultiplie lui-même chaque famille sur `var.zones` et sur ses `sizes` (une `scaleway_k8s_pool`
-  par combinaison famille × taille × zone). `autoscaling`, `autohealing`, `container_runtime`,
-  `public_ip_disabled`, ainsi que `size`/`min_size` (figés à `0`), ne sont pas paramétrables : le
-  module suppose systématiquement un autoscaler actif qui pilote seul la taille réelle du pool
-  depuis sa création.
+  par combinaison famille × taille × zone). Une taille peut se limiter à certaines zones (`zones`)
+  et garder un plancher par zone (`min_per_zone`, 0 par défaut). `autoscaling`, `autohealing` et
+  `container_runtime` ne sont pas paramétrables : le module suppose systématiquement un autoscaler
+  actif qui pilote la taille réelle du pool depuis sa création.
+- `public_ip_disabled` (`true` par défaut) : les nodes sortent par la public gateway du module
+  `vpc`. Avec `false`, chaque node a son IP publique et sort seul, sans gateway ni route par
+  défaut à pousser ; `network_dependencies` devient alors inutile.
+
+  Exemple, nodes publics sur trois zones, un seul petit node dans la plus chère, et des petits
+  nodes de débordement dans une famille à part, qui démarre donc à 0 :
+
+  ```hcl
+  public_ip_disabled = false
+  zones              = ["fr-par-1", "fr-par-2", "fr-par-3"]
+
+  pools = [
+    {
+      name = "default"
+      sizes = [
+        { node_type = "PRO2-XS", min_per_zone = 1, max_per_zone = 3, zones = ["fr-par-1", "fr-par-2"] },
+        { node_type = "PRO2-XXS", min_per_zone = 1, max_per_zone = 1, zones = ["fr-par-3"] },
+      ]
+    },
+    {
+      name  = "overflow"
+      sizes = [{ node_type = "PRO2-XXS", max_per_zone = 2, zones = ["fr-par-1", "fr-par-2"] }]
+    },
+  ]
+  ```
 - Le nom réel du pool (argument `name`) inclut un hash de `root_volume_size_in_gb` (seul attribut
   encore variable et `ForceNew` du provider) pour garantir que l'ancien et le nouveau pool n'ont
   jamais le même nom pendant la fenêtre de `create_before_destroy` — la clé du pool dans

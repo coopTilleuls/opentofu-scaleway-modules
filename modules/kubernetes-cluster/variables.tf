@@ -113,9 +113,12 @@ variable "pools" {
     size=1 (les autres démarrent à 0), l'API Scaleway refusant qu'un cluster Kapsule ait 0 nodes
     au total.
 
-    `autoscaling`, `autohealing`, `container_runtime`, `public_ip_disabled`, ainsi que `min_size`
-    (figé à 0), ne sont pas paramétrables : le module suppose systématiquement un autoscaler actif
-    qui pilote seul la taille réelle du pool une fois créé.
+    Par taille, `zones` restreint la taille à une partie de `var.zones` (toutes par défaut), et
+    `min_per_zone` fixe le `min_size` de chaque pool (0 par défaut).
+
+    `autoscaling`, `autohealing` et `container_runtime` ne sont pas paramétrables : le module
+    suppose systématiquement un autoscaler actif qui pilote seul la taille réelle du pool une fois
+    créé.
   EOT
   type = list(object({
     name   = string
@@ -128,15 +131,33 @@ variable "pools" {
     })), [])
     sizes = list(object({
       node_type              = string
+      min_per_zone           = optional(number, 0)
       max_per_zone           = number
       root_volume_size_in_gb = optional(number, 20)
+      zones                  = optional(list(string))
     }))
   }))
+
+  validation {
+    condition = alltrue(flatten([for pool in var.pools : [
+      for size in pool.sizes : size.zones == null || length(setsubtract(coalesce(size.zones, []), var.zones)) == 0
+    ]]))
+    error_message = "Les `zones` d'une taille doivent faire partie de var.zones."
+  }
 
   validation {
     condition     = contains([for pool in var.pools : pool.name], "default")
     error_message = "var.pools doit contenir une famille nommée \"default\" (c'est elle qui démarre avec size=1, requis par l'API Scaleway pour qu'un cluster Kapsule ait au moins un node)."
   }
+}
+
+variable "public_ip_disabled" {
+  description = <<-EOT
+    Nodes sans IP publique : leur trafic sortant passe alors par une public gateway (module
+    `vpc`). `false` donne une IP publique à chaque node, pour sortir sans gateway.
+  EOT
+  type        = bool
+  default     = true
 }
 
 variable "pool_upgrade_policy" {

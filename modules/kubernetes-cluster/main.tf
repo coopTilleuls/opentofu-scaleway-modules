@@ -74,7 +74,9 @@ locals {
   zonal_sized_pools = flatten([
     for pool in var.pools : [
       for size in pool.sizes : [
-        for zone in var.zones : {
+        # `zones` d'une taille restreint celle-ci à une partie de var.zones (ex : un petit node
+        # seul dans une zone plus chère).
+        for zone in coalesce(size.zones, var.zones) : {
           # Underscore-joined, sans les "_" ni "-" internes de node_type : reproduit le schéma de
           # nommage des ressources scaleway_k8s_pool brutes préexistantes, pour que `name`
           # (ci-dessous) ne change pas de valeur lors d'une migration vers ce module (sans quoi,
@@ -84,6 +86,7 @@ locals {
           slug                   = "${pool.name}_${replace(lower(size.node_type), "/[_-]/", "")}_${regex("[0-9]+$", zone)}"
           zone                   = zone
           node_type              = size.node_type
+          min_per_zone           = size.min_per_zone
           max_per_zone           = size.max_per_zone
           root_volume_size_in_gb = size.root_volume_size_in_gb
           tags                   = pool.tags
@@ -120,17 +123,18 @@ resource "scaleway_k8s_pool" "this" {
 
   # size=1 requis à la création sur la famille "default" (et elle seule) : l'API Scaleway refuse
   # qu'un cluster Kapsule ait 0 nodes au total, donc size=0 échoue systématiquement s'il n'y a
-  # jamais eu de node. Les autres familles démarrent à 0. min_size reste à 0 pour laisser
-  # l'autoscaler (toujours actif ci-dessous) redescendre ensuite si besoin.
-  size        = each.value.is_default ? 1 : 0
-  min_size    = 0
+  # jamais eu de node. Les autres familles démarrent à 0. min_size vaut 0 par défaut pour laisser
+  # l'autoscaler (toujours actif ci-dessous) redescendre ensuite si besoin ; `min_per_zone` garde
+  # un plancher (ex : un node par zone pour un quorum).
+  size        = max(each.value.min_per_zone, each.value.is_default ? 1 : 0)
+  min_size    = each.value.min_per_zone
   max_size    = each.value.max_per_zone
   autoscaling = true
   autohealing = true
 
   container_runtime      = "containerd"
   root_volume_size_in_gb = each.value.root_volume_size_in_gb
-  public_ip_disabled     = true
+  public_ip_disabled     = var.public_ip_disabled
 
   # "scw-compute-image" (provisionnement plus rapide des nodes) est systématique sur les deux
   # repos sources, d'où son ajout en dur ici plutôt que via var.tags.
