@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.2.0](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v5.1.1...kubernetes-cluster-v5.2.0) (2026-11-26)
+
+
+### Features
+
+* **cockpit-alerting-custom-rules:** clean service levels ([b4bb473](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/b4bb473163d1da04e660009e2f346c9f2c3fc382))
+* **cockpit-alerting:** clean routes ([8258a2b](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/8258a2bbcbc6e71544f64d552ae71771c5bf0e13))
+* **kubernetes-cluster:** nodes publics ([#93](https://github.com/coopTilleuls/opentofu-scaleway-modules/issues/93)) ([53a4417](https://github.com/coopTilleuls/opentofu-scaleway-modules/commit/53a441717baadd9ae4b898c5a156b609d0fce916))
+
 ## [5.1.1](https://github.com/coopTilleuls/opentofu-scaleway-modules/compare/kubernetes-cluster-v5.1.0...kubernetes-cluster-v5.1.1) (2026-09-14)
 
 
