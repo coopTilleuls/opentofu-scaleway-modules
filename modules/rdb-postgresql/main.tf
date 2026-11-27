@@ -211,7 +211,7 @@ resource "scaleway_rdb_user" "this_ro" {
 }
 
 resource "scaleway_rdb_privilege" "this" {
-  for_each = var.create_dedicated_users && var.create_readonly_users ? toset(var.databases) : []
+  for_each = var.create_dedicated_users ? toset(var.databases) : []
 
   # Contrairement à scaleway_rdb_database/scaleway_rdb_user, le provider Scaleway ne déduit pas la
   # région de scaleway_rdb_privilege depuis le préfixe régional d'instance_id : sans `region`
